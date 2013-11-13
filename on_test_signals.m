@@ -8,6 +8,7 @@ peak_position_sin = find(xcorr_sinus==max(findpeaks(xcorr_sinus)));
 delay_sinus = peak_position_sin - length(seno1);
 
 if DEBUG
+    figure
     hold on
     subplot(1,2,1)
     plot(xcorr_sinus); title('xcorr between sinus');

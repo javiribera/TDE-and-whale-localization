@@ -1,58 +1,58 @@
-function init_test_signals()
-    % Crea señales de prueba con un retardo conocido:
-    % 2 senos y 2 chirps
-    %
-    DEBUG=1;
+% Crea señales de prueba con un retardo conocido:
+% 2 senos y 2 chirps
+%
+DEBUG=0;
 
-    %% Init parameters of the signals
+%% Init parameters of the signals
 
-    fs = 96e3; % sampling rate, the same as in the sensors, 96 KHz
-    nsamples = 2^16; % length of the sequence
-
-
-    delay_seconds = 100e-6; % 100us. Low, as a large delay is undetectable in pure sinus
-    delay_samples = floor(delay_seconds*fs);
-    
-    time_instants = [1:nsamples]./fs;
-    delayed_time_instants = [1+delay_samples:nsamples+delay_samples]./fs;
+fs = 96e3; % sampling rate, the same as in the sensors, 96 KHz
+nsamples = 2^16; % length of the sequence
 
 
-    %% 1) Delayed sinus
-    F = 4e3; % 4 KHz
+delay_seconds = 100e-6; % 100us. Low, as a large delay is undetectable in pure sinus
+delay_samples = floor(delay_seconds*fs);
 
-    % for optimization purposes, we'll compute 2pi*F just once
-    twopif = 2*pi*F;
-
-    % delayed sinus
-    seno1 = sin(twopif.*time_instants);
-    seno2 = sin(twopif.*delayed_time_instants);
+time_instants = [1:nsamples+delay_samples]./fs;
 
 
-    %% 2) Delayed Chirps
-    F_init = 4e3; % 4 KHz
-    F_final = 10e3; % 10 KHz
+%% 1) Delayed sinus
+F = 4e3; % 4 KHz
 
-    chirp1 = chirp(time_instants, F_init, max(time_instants), F_final);
-    chirp2 = chirp(delayed_time_instants, F_init, max(delayed_time_instants), F_final);
+% for optimization purposes, we'll compute 2pi*F just once
+twopif = 2*pi*F;
+bigseno = sin(twopif.*[1:nsamples+delay_samples]./fs);
 
-    %% DEBUG: Visualize test signals
-    if DEBUG
-        subplot(1,2,1);
-        hold on;
-        plot(seno1(1:10000),'b'); plot(seno2(1:10000),'r');
-        title(['2 sinus at ',int2str(F),'Hz delayed ', int2str(delay_samples),' samples']);
-        xlabel('time in samples');
+% delayed sinus
+seno1 = bigseno(1:nsamples);
+seno2 = bigseno(delay_samples:nsamples+delay_samples);
 
-        subplot(1,2,2);
-        hold on;
-        plot(chirp1(1:10000),'b'); plot(chirp2(1:10000), 'r');
-        title(['2 chirps delayed ', int2str(delay_samples),' samples']);
-        xlabel('time in samples');
-    end
 
-    %% Store signals
-    if ~DEBUG
-        save('test_signals', 'seno1','seno2','chirp1','chirp2','delay_samples','fs');
-        clear;
-    end
+%% 2) Delayed Chirps
+F_init = 4e3; % 4 KHz
+F_final = 400e3; % 40 KHz
+
+bigchirp = chirp([1:nsamples+delay_samples]./fs, F_init, (nsamples+delay_samples)/fs, F_final);
+chirp1 = bigchirp(1:nsamples);
+chirp2 = bigchirp(delay_samples:nsamples+delay_samples);
+
+%% DEBUG: Visualize test signals
+if DEBUG
+    subplot(1,2,1);
+    hold on;
+    plot(seno1,'b'); plot(seno2,'r');
+    title(['2 sinus at ',int2str(F),'Hz delayed ', int2str(delay_samples),' samples']);
+    xlabel('time in samples');
+
+    subplot(1,2,2);
+    hold on;
+    plot(chirp1,'b'); plot(chirp2, 'r');
+    title(['2 chirps delayed ', int2str(delay_samples),' samples']);
+    xlabel('time in samples');
+end
+
+%% Store signals
+save('test_signals', 'seno1','seno2','chirp1','chirp2','delay_samples','fs');
+
+if ~DEBUG
+    clear;
 end
