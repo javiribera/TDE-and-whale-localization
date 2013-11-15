@@ -28,8 +28,8 @@ seno2 = bigseno(delay_samples:nsamples+delay_samples);
 
 
 %% 2) Delayed Chirps
-F_init = 4e3; % 4 KHz
-F_final = 400e3; % 40 KHz
+F_init = 1e3; % 1 KHz
+F_final = 10e3; % 10 KHz
 
 bigchirp = chirp([1:nsamples+delay_samples]./fs, F_init, (nsamples+delay_samples)/fs, F_final);
 chirp1 = bigchirp(1:nsamples);
