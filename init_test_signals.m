@@ -24,7 +24,7 @@ bigseno = sin(twopif.*[1:nsamples+delay_samples]./fs);
 
 % delayed sinus
 seno1 = bigseno(1:nsamples);
-seno2 = bigseno(delay_samples:nsamples+delay_samples);
+seno2 = bigseno(1+delay_samples:nsamples+delay_samples);
 
 
 %% 2) Delayed Chirps
@@ -33,7 +33,7 @@ F_final = 10e3; % 10 KHz
 
 bigchirp = chirp([1:nsamples+delay_samples]./fs, F_init, (nsamples+delay_samples)/fs, F_final);
 chirp1 = bigchirp(1:nsamples);
-chirp2 = bigchirp(delay_samples:nsamples+delay_samples);
+chirp2 = bigchirp(1+delay_samples:nsamples+delay_samples);
 
 %% DEBUG: Visualize test signals
 if DEBUG
