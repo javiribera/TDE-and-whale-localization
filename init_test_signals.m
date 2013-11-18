@@ -6,7 +6,7 @@ DEBUG=0;
 %% Init parameters of the signals
 
 fs = 96e3; % sampling rate, the same as in the sensors, 96 KHz
-nsamples = 2^16; % length of the sequence
+nsamples = 2^10; % length of the sequence
 
 
 delay_seconds = 100e-6; % 100us. Low, as a large delay is undetectable in pure sinus

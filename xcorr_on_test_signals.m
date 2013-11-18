@@ -3,9 +3,7 @@ load 'test_signals.mat';
 DEBUG=0;
 
 %% TDE on sinus using xcorr and the maximum peak
-xcorr_sinus = xcorr(seno1,seno2);
-peak_position_sin = find(xcorr_sinus==max(findpeaks(xcorr_sinus)));
-delay_sinus = peak_position_sin - length(seno1);
+delay_sinus = delay_xcorr(seno1, seno2);
 
 if DEBUG
     figure
@@ -15,9 +13,7 @@ if DEBUG
 end
 
 %% TDE on chirp using xcorr and the maximum peak
-xcorr_chirp = xcorr(chirp1,chirp2);
-peak_position_chirp = find(xcorr_chirp==max(findpeaks(xcorr_chirp)));
-delay_chirp = peak_position_chirp - length(chirp1);
+delay_chirp = delay_xcorr(chirp1, chirp2);
 
 if DEBUG
     subplot(1,2,2)
