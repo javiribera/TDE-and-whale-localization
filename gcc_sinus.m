@@ -2,7 +2,7 @@
 load 'test_signals.mat';
 DEBUG=1;
 
-gcc_mode = 'phat';
+
 figure
     hold on
     figure(1)
@@ -11,13 +11,19 @@ figure
     
     plot(chirp1,'b'); plot(chirp2,'r');
 
-%% TDE on sinus using gcc and the maximum peak
+
+    %% TDE on sinus using gcc and the maximum peak
+
+gcc_mode = 'cc'; 
+M=length(seno1);
 gcc_sinus = gcc_marques_nuevo(seno1,seno2,gcc_mode);
-peak_position_sin = find(gcc_sinus==max(findpeaks(gcc_sinus)));
-delay_sinusgcc = peak_position_sin - length(seno1)
+[val,ind]=max(gcc_sinus);
+delay_gcorrsinus= ind-M
+
 cc_sinus=xcorr(seno1,seno2);
-peak_position_sin1 = find(cc_sinus==max(findpeaks(cc_sinus)));
-delay_sinuscc = peak_position_sin1 - length(seno1)
+[val,ind]=max(cc_sinus);
+delay_xcorrsinus= ind-M
+
 if DEBUG
     figure
     hold on
@@ -30,11 +36,14 @@ end
 
 %% TDE on chirp using xcorr and the maximum peak
 cc_chirp = xcorr(chirp1,chirp2);
-peak_position_chirp = find(cc_chirp==max(findpeaks(cc_chirp)));
-delay_chirpcc = peak_position_chirp - length(chirp1)
+M=length(chirp1);
+
+[val,ind]=max(cc_chirp);
+delay_ccchirp= ind-M
+
 gcc_chirp = gcc_marques_nuevo(chirp1,chirp2,gcc_mode);
-peak_position_chirpgcc = find(gcc_chirp==max(findpeaks(gcc_chirp)));
-delay_chirpgcc = peak_position_chirpgcc - length(chirp1)
+[val,ind]=max(gcc_chirp);
+delay_gccorrchirp= ind-M
 
 if DEBUG
     figure;

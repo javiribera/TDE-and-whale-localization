@@ -9,7 +9,7 @@ DEBUG=1;
 fs = 250e3; % sampling rate, the same as in the sensors, 250 KHz
 nsamples = 2^8; % length of the sequence
 
-delay_seconds = 50e-6; % 33us.
+delay_seconds = 40e-6; % 33us.
 delay_samples = floor(delay_seconds*fs);
 
 time_instants = [1:nsamples]./fs;

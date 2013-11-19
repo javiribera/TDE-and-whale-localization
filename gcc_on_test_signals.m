@@ -11,7 +11,7 @@ if DEBUG
     figure
     hold on
     subplot(1,2,1)
-    plot(gcc_sinus); title('gcc between sinus');
+    plot(delay_sinus); title('gcc between sinus');
 end
 
 %% TDE on chirp using xcorr and the maximum peak

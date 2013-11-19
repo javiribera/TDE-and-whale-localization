@@ -10,7 +10,7 @@ function estimated_delay = delay_xcorr( input1, input2 )
     cc = xcorr(input1,input2);
     [value, peak_positions] = max(cc);
     peak_position = max(peak_positions);
-    estimated_delay = peak_position - length(input1);
-    cosa añadida
+    estimated_delay = peak_position - length(input1)
+    
 end
 
