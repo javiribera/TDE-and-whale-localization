@@ -12,7 +12,16 @@ text2=sprintf(' Signal2. Sampling frequency: %d Hz.\n Number of samples: %d\n Ti
 DEBUG=1;
 Fs=sampling1;
 
+%cortar la señal pq es muy grande
+inicio=12960000;
+final=14880000;
+Signalcortada=Signal(inicio:final);
+Signal2cortada=Signal2(inicio:final);
+M =length(Signalcortada);
+
 %%
+
+%Mirar la señal--NOOOOO
 
 clear ax;
 cortada=0.33*length(Signal);
@@ -30,7 +39,7 @@ linkaxes(ax,'x');
 % Let us listen to the first two clicks at hydrophone #1. 
 soundsc(Signal(150*Fs:165*Fs),Fs);
 
-%% Real noise see
+%% Real noise see--NOOO
 real_noise=Signal(1.26e4:1.46e4);
 real_noise_std=std(real_noise)
 
@@ -38,7 +47,26 @@ clf;
 pwelch(real_noise,[],[],[],Fs);
 
 
-%% TK
+
+%% Spectral substracting noise (powepoint Ludwig)
+N=final-inicio;
+alpha=0.8;
+p=2;
+r=10000;
+    Signalmedia(1)=Signalcortada(1);
+    Signalestimada(1)=Signalcortada(1);
+for i=2:length(Signalcortada)
+Signalmedia(i)=(alpha*(Signalmedia(i-1).^p)+(1-alpha)*(Signalcortada(i).^p)).^(1/p);
+Signalestimada(i)=r*Signalcortada(i)./Signalestimada(i-1);
+end
+
+ Signal2media(1)=Signal2cortada(1);
+    Signal2estimada(1)=Signal2cortada(1);
+for i=2:length(Signal2cortada)
+Signal2media(i)=(alpha*(Signal2media(i-1).^p)+(1-alpha)*(Signal2cortada(i).^p)).^(1/p);
+Signal2estimada(i)=r*Signal2cortada(i)./Signal2estimada(i-1);
+end
+%% TK--NOOO
 output_tk=teager_kaiser(input);
 
 ax(1)=subplot(3,1,1);
@@ -52,31 +80,23 @@ linkaxes(ax,'x');
 
 
 
-%% TDE on sinus using xcorr and the maximum peak
+%% TDE on  data using xcorr and the maximum peak
 gcc_mode = 'phat';
 gcc_mode1 = 'cc';
-%cortar la señal pq es muy grande
-Signalcortada=Signal(12960000:15840000);
-Signal2cortada=Signal2(12960000:15840000);
+
 
 %Xcorr
-xcorr_ballena = xcorr(Signalcortada,Signal2cortada);
-
+xcorr_ballena = xcorr(Signalestimada,Signal2estimada);
 [val,ind]=max(xcorr_ballena );
-M =length(Signalcortada)
 delay_ball2= ind-M
 %Gcorr normal
-gcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode1);
-
+gcorr_ballena = gcc_marques_nuevo(Signalestimada,Signal2estimada,gcc_mode1);
 [val,ind]=max(gcorr_ballena );
-M = length(Signalcortada);
 delay_ballgccn2= ind-M
 
 %Gcorr phat
-gpcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode);
-
+gpcorr_ballena = gcc_marques_nuevo(Signalestimada,Signal2estimada,gcc_mode);
 [val,ind]=max(gpcorr_ballena );
-M = length(Signalcortada);
 delay_ballgccp2= ind-M
 %plot todo 
 if DEBUG
@@ -92,17 +112,8 @@ end
 
 
 
-%% TDE on chirp using xcorr and the maximum peak
-Signal=Signal(1:18000000);
-Signal2=Signal2(1:18000000);
-xcorr_chirp = xcorr(Signal,Signal2);
-peak_position_chirp=find(xcorr_chirp==max(findpeaks(xcorr_chirp)))
-delay_chirp = peak_position_chirp - length(Signal);
+%% TDE 
 
-if DEBUG
-    subplot(1,2,2)
-    plot(xcorr_chirp); title('xcorr between chirps');
-end
 
 %% DEBUG: no need of aux. variables
 if ~DEBUG
