@@ -12,4 +12,3 @@ function estimated_delay = delay_gcc( input1, input2 )
     peak_position = max(peak_positions);
     estimated_delay = peak_position - length(input1);
 end
-
