@@ -51,7 +51,8 @@ if DEBUG
 end
 
 %% Store signals
-save('test_signals', 'seno1','seno2','chirp1','chirp2','delay_samples','fs');
+real_delay_samples = delay_samples;
+save('test_signals', 'seno1','seno2','chirp1','chirp2','real_delay_samples','fs');
 
 if ~DEBUG
     clear;
