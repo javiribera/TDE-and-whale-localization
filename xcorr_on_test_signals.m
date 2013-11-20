@@ -1,6 +1,6 @@
 init_test_signals()
 load 'test_signals.mat';
-DEBUG=0;
+DEBUG=1;
 
 %% TDE on sinus using xcorr and the maximum peak
 delay_sinus = delay_xcorr(seno1, seno2);
