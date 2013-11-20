@@ -9,7 +9,7 @@ if DEBUG
     figure
     hold on
     subplot(1,2,1)
-    plot(xcorr_sinus); title('xcorr between sinus');
+    plot(xcorr(seno1, seno2)); title('xcorr between sinus');
 end
 
 %% TDE on chirp using xcorr and the maximum peak
@@ -17,7 +17,7 @@ delay_chirp = delay_xcorr(chirp1, chirp2);
 
 if DEBUG
     subplot(1,2,2)
-    plot(xcorr_chirp); title('xcorr between chirps');
+    plot(xcorr(chirp1, chirp2)); title('xcorr between chirps');
 end
 
 %% DEBUG: no need of aux. variables
