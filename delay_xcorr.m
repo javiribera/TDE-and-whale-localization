@@ -11,6 +11,10 @@ function estimated_delay = delay_xcorr( input1, input2 )
     [value, peak_positions] = max(cc);
     peak_position = max(peak_positions);
     estimated_delay = peak_position - length(input1);
-    cosa añadida
+    cosa aï¿½adida
 end
 
+% Instead of detecting the maximum of the cross correlation, we could have
+% also find the minimum of the average-magnitude-difference funtion (AMDF),
+% which is equivalent statisticaly, but it was out of scope. of the
+% project.
