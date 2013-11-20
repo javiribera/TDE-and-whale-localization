@@ -52,20 +52,24 @@ pwelch(real_noise,[],[],[],Fs);
 N=final-inicio;
 alpha=0.8;
 p=2;
-r=10000;
-    Signalmedia(1)=Signalcortada(1);
-    Signalestimada(1)=Signalcortada(1);
-for i=2:length(Signalcortada)
-Signalmedia(i)=(alpha*(Signalmedia(i-1).^p)+(1-alpha)*(Signalcortada(i).^p)).^(1/p);
-Signalestimada(i)=r*Signalcortada(i)./Signalestimada(i-1);
+r=(max(Signalcortada)-min(Signalcortada))./2
+
+    Signalmedia(1)=abs(Signalcortada(1));
+    Signalestimada(1)=abs(Signalcortada(1));
+for i=2:N
+Signalmedia(i)=(alpha.*(abs(Signalmedia(i-1)).^p)+(1-alpha).*(abs(Signalcortada(i)).^p)).^(1/p);
+Signalestimada(i)=r.*Signalcortada(i)./(Signalestimada(i-1));
 end
 
- Signal2media(1)=Signal2cortada(1);
-    Signal2estimada(1)=Signal2cortada(1);
-for i=2:length(Signal2cortada)
-Signal2media(i)=(alpha*(Signal2media(i-1).^p)+(1-alpha)*(Signal2cortada(i).^p)).^(1/p);
-Signal2estimada(i)=r*Signal2cortada(i)./Signal2estimada(i-1);
+ Signal2media(1)=abs(Signal2cortada(1));
+    Signal2estimada(1)=abs(Signal2cortada(1));
+for i=2:N
+Signal2media(i)=(alpha.*(abs(Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
+Signal2estimada(i)=r.*Signal2cortada(i)./(Signal2estimada(i-1));
 end
+
+Signalestimada(1919990:1920000)
+
 %% TK--NOOO
 output_tk=teager_kaiser(input);
 
