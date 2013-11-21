@@ -1,14 +1,14 @@
-%cargar señal
+%Load Signal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
 [Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
 
-%Tiempos
+%Times
 primerevento_inicial=2880000;
 primerevento_final=3840000;
 segundoevento_inicial=50880000;
 segundoevento_final=51840000;
 
-%calcular lenght, sample freq y sacarlo por pantalla
+%¡ lenght, sample freq and print
 [fileLength2,num_channels2]=size(Signal2);
 [fileLength1,num_channels1]=size(Signal);
 duration1=fileLength1/sampling1;
@@ -18,7 +18,7 @@ text2=sprintf(' Signal2. Sampling frequency: %d Hz.\n Number of samples: %d\n Ti
 DEBUG=1;
 Fs=sampling1;
 
-%cortar la señal pq es muy grande
+%Cut the SIGNAL
 inicio=primerevento_inicial;
 final=primerevento_final;
 
@@ -31,28 +31,28 @@ M =length(Signalcortada)
 
 %Mirar la señal--NOOOOO
 
-clear ax;
-cortada=0.33*length(Signal);
-time=(0:cortada-1)/Fs;
-ax(1)=subplot(3,1,1); plot(time,Signal)
-ylabel('Amplitude');
-title('Signal #1');
-hold on;
-ax(2)=subplot(3,1,2); plot(time,Signal2)
-ylabel('Amplitude');
-title('Signal #2');
-linkaxes(ax,'x');
+%clear ax;
+%cortada=0.33*length(Signal);
+%time=(0:cortada-1)/Fs;
+%ax(1)=subplot(3,1,1); plot(time,Signal)
+%ylabel('Amplitude');
+%title('Signal #1');
+%hold on;
+%ax(2)=subplot(3,1,2); plot(time,Signal2)
+%ylabel('Amplitude');
+%title('Signal #2');
+%linkaxes(ax,'x');
 %zoom
 %set(gca,'xlim',[6.66 6.73]);
 % Let us listen to the first two clicks at hydrophone #1. 
-soundsc(Signal(150*Fs:165*Fs),Fs);
+%soundsc(Signal(150*Fs:165*Fs),Fs);
 
 %% Real noise see--NOOO
-real_noise=Signal(1.26e4:1.46e4);
-real_noise_std=std(real_noise)
+%real_noise=Signal(1.26e4:1.46e4);
+%real_noise_std=std(real_noise)
 
-clf;
-pwelch(real_noise,[],[],[],Fs);
+%clf;
+%pwelch(real_noise,[],[],[],Fs);
 
 
 
@@ -81,7 +81,7 @@ figure(2)
 specgram(Signalestimada)
 figure(3)  
 specgram(Signalcortada)
-Signalestimada(1:300000)
+
 
 
 
@@ -90,14 +90,14 @@ Signalestimada(1:300000)
 N=final-inicio;
 c=1;
 
-S=fft(Signalcortada);
+S=spectrogram(Signalcortada);
 M=length(S)
 
 for i=1:M
 N=prctile(S(i),50);
 Sestimada(i)=max(0,S(i)-N);
 end
-S2=fft(Signal2cortada);
+S2=spectrogram(Signal2cortada);
 for i=1:M
 N=prctile(S2(i),50);
 Sestimada2(i)=max(0,S2(i)-N);
@@ -115,16 +115,16 @@ plot (Sestimada2)
 
 
 %% TK--NOOO
-output_tk=teager_kaiser(input);
+%output_tk=teager_kaiser(input);
 
-ax(1)=subplot(3,1,1);
-plot(input);
-ylabel('Amplitude');
-ax(2)=subplot(3,1,2);
-plot(output_tk);
-set(gca,'ylim',[-0.01 0.01]);
-ylabel('Amplitude');
-linkaxes(ax,'x');
+%ax(1)=subplot(3,1,1);
+%plot(input);
+%ylabel('Amplitude');
+%ax(2)=subplot(3,1,2);
+%plot(output_tk);
+%set(gca,'ylim',[-0.01 0.01]);
+%ylabel('Amplitude');
+%linkaxes(ax,'x');
 
 
 
