@@ -2,7 +2,7 @@
 % que puede haber entre los sensores proporcionados.
 % Habra que pasarlo a muestras multiplicando por la frecuencia de muestreo
 % Util para escoger el tamano de frame minimo para calcular el delay
-% A ojo, podria ser frame_len = k (delay_max + signal_len)
+% A ojo, podria ser frame_len = k (2*delay_max + signal_len)
 
 % underwater speed of sound in meters/seconds
 speed = 1560;
