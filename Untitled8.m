@@ -13,11 +13,11 @@ DEBUG=1;
 Fs=sampling1;
 
 %cortar la señal pq es muy grande
-inicio=2880000;
-final=3840000;
+inicio=50880000;
+final=51840000;
 Signalcortada=Signal(inicio:final);
 Signal2cortada=Signal2(inicio:final);
-M =length(Signalcortada);
+M =length(Signalcortada)
 
 %%
 
@@ -106,7 +106,7 @@ linkaxes(ax,'x');
 
 
 %% TDE on  data using xcorr and the maximum peak
-gcc_mode = 'phat';
+gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 
 
@@ -131,10 +131,10 @@ if DEBUG
     plot(xcorr_ballena); title('xcorr between whales');
  
    figure(2)
-    plot(gcorr_ballena); title('gcorr-corr between whales');figure
+    plot(gcorr_ballena); title('gcorr-corr between whales');
     
   figure(3)
-    plot(gpcorr_ballena); title('gcorr phat between whales');
+    plot(gpcorr_ballena); title('gcorr Scot between whales');
 end
 
 
