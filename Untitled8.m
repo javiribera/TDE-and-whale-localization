@@ -89,19 +89,26 @@ Signalestimada(1:300000)
 %% Percentile noise substraction
 N=final-inicio;
 c=1;
-NFFT=2*N+1;
-S=spectrogram(Signalcortada);
-for i=1:N
+
+S=fft(Signalcortada);
+M=length(S)
+
+for i=1:M
 N=prctile(S(i),50);
-Sestimada(i)=max(0,S(i)-c.*N);
+Sestimada(i)=max(0,S(i)-N);
 end
-
-S2=spectrogram(Signal2cortada);
-for i=1:N
-N2=prctile(S2(i),50);
-Sestimada2(i)=max(0,S2(i)-c.*N2);
+S2=fft(Signal2cortada);
+for i=1:M
+N=prctile(S2(i),50);
+Sestimada2(i)=max(0,S2(i)-N);
 end
+Signalpercentil=ifft(Sestimada);
+Signalpercentil2=ifft(Sestimada2);
 
+figure(1)
+plot(Sestimada)
+figure(2)
+plot (Sestimada2)
 
 
 
