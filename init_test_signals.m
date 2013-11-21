@@ -1,7 +1,7 @@
 % Crea señales de prueba con un retardo conocido:
-% 2 senos y 2 chirps
+% 2 senos, 2 chirps, y ruido blanco
 %
-DEBUG=0;
+DEBUG=1;
 
 %% Init parameters of the signals
 
@@ -35,18 +35,29 @@ bigchirp = chirp([1:nsamples+delay_samples]./fs, F_init, (nsamples+delay_samples
 chirp1 = bigchirp(1:nsamples);
 chirp2 = bigchirp(1+delay_samples:nsamples+delay_samples);
 
+%% 3) Delayed White noise
+bignoise = randn(1,nsamples+delay_samples);
+noise1 = bignoise(1:nsamples);
+noise2 = bignoise(1+delay_samples:nsamples+delay_samples);
+
 %% DEBUG: Visualize test signals
 if DEBUG
-    subplot(1,2,1);
+    subplot(1,3,1);
     hold on;
     plot(seno1,'b'); plot(seno2,'r');
     title(['2 sinus at ',int2str(F),'Hz delayed ', int2str(delay_samples),' samples']);
     xlabel('time in samples');
 
-    subplot(1,2,2);
+    subplot(1,3,2);
     hold on;
     plot(chirp1,'b'); plot(chirp2, 'r');
     title(['2 chirps delayed ', int2str(delay_samples),' samples']);
+    xlabel('time in samples');
+
+    subplot(1,3,3);
+    hold on;
+    plot(noise1,'b'); plot(noise2, 'r');
+    title(['2 noises delayed ', int2str(delay_samples),' samples']);
     xlabel('time in samples');
 end
 
