@@ -6,10 +6,11 @@ DEBUG=1;
 %% Init parameters of the signals
 
 fs = 96e3; % sampling rate, the same as in the sensors, 96 KHz
-nsamples = 2^16; % length of the sequence
+nsamples = 2^20; % length of the sequence
 
 
-delay_seconds = 100e-6; % 100us. Low, as a large delay is undetectable in pure sinus
+delay_seconds = 3;  % possible real delay, -> but larger than sinus period,
+                    % so delay on sinus is periodic
 delay_samples = floor(delay_seconds*fs);
 
 time_instants = [1:nsamples+delay_samples]./fs;
