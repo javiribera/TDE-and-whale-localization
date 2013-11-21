@@ -2,7 +2,7 @@ init_test_signals()
 load 'test_signals.mat';
 DEBUG=1;
 
-gcc_mode = 'phat';
+gcc_mode = 'scot';
 
 %% TDE on sinus using gcc and the maximum peak
 delay_sinus = delay_gcc(seno1, seno2, gcc_mode);

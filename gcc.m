@@ -36,15 +36,17 @@ elseif(strcmp(flag,'phat'));
    zc = [phi_z1z2(NFFT-M+2:NFFT) phi_z1z2(1:M)];  % re-arrange the vector
 
 elseif(strcmp(flag,'scot'))
-        % Smoothed Coherence Transform (SCOT) 
-        % ----------------------------------------------------------------- 
-        % this processor exhibits the same spreading as the Roth processor. 
-      
-        W=(Phi_z1z1.*Phi_z2z2).^0.5;
-        phi_z1z2 = ifft(Phi_z1z2 .* W);
-        zc = [phi_z1z2(NFFT-M+2:NFFT) phi_z1z2(1:M)];  % re-arrange the vector  
+    % Smoothed Coherence Transform (SCOT) 
+    % ----------------------------------------------------------------- 
+    % this processor exhibits the same spreading as the Roth processor. 
+
+    W = 1./( (Z1.*Z2).^0.5 );
+    phi_z1z2 = ifft(Phi_z1z2 .* W);
+    zc = [phi_z1z2(NFFT-M+2:NFFT) phi_z1z2(1:M)];  % re-arrange the vector  
         
 else
    disp('Invalid value for flag');
 end
+
+zc = real(zc); %just in case (this way we can visualize gcc scot)
 
