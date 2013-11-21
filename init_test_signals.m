@@ -1,7 +1,7 @@
 % Crea señales de prueba con un retardo conocido:
 % 2 senos, 2 chirps, y ruido blanco
 %
-DEBUG=1;
+DEBUG=0;
 
 %% Init parameters of the signals
 
@@ -64,7 +64,7 @@ end
 
 %% Store signals
 real_delay_samples = delay_samples;
-save('test_signals', 'seno1','seno2','chirp1','chirp2','real_delay_samples','fs');
+save('test_signals', 'seno1','seno2','chirp1','chirp2','noise1', 'noise2', 'real_delay_samples','fs');
 
 if ~DEBUG
     clear;
