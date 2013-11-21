@@ -13,8 +13,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %cortar la señal pq es muy grande
-inicio=12960000;
-final=14880000;
+inicio=2880000;
+final=3840000;
 Signalcortada=Signal(inicio:final);
 Signal2cortada=Signal2(inicio:final);
 M =length(Signalcortada);
@@ -114,15 +114,17 @@ gcc_mode1 = 'cc';
 xcorr_ballena = xcorr(Signalcortada,Signal2cortada);
 [val,ind]=max(xcorr_ballena );
 delay_ball= ind-M
+delay_ball_s=delay_ballgccn/Fs;
 %Gcorr normal
 gcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode1);
 [val,ind]=max(gcorr_ballena );
 delay_ballgccn= ind-M
-
+delay_ballgccn_s=delay_ballgccn/Fs;
 %Gcorr phat
 gpcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode);
 [val,ind]=max(gpcorr_ballena );
 delay_ballgccp= ind-M
+delay_ballgccp_s=delay_ballgccp/Fs;
 %plot todo 
 if DEBUG
     figure(1)
