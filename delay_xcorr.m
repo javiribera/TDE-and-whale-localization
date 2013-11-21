@@ -15,4 +15,5 @@ end
 
 % Instead of detecting the maximum of the cross correlation, we could have
 % also find the minimum of the average-magnitude-difference funtion (AMDF),
-% which is equivalent statisticaly.
+% which is equivalent statisticaly. But this is likely to not detect very
+% well, as neither does the xcorr.
