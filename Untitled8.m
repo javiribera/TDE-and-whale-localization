@@ -13,11 +13,11 @@ DEBUG=1;
 Fs=sampling1;
 
 %cortar la señal pq es muy grande
-inicio=12960000;
-final=14880000;
+inicio=50880000;
+final=51840000;
 Signalcortada=Signal(inicio:final);
 Signal2cortada=Signal2(inicio:final);
-M =length(Signalcortada);
+M =length(Signalcortada)
 
 %%
 
@@ -50,7 +50,7 @@ pwelch(real_noise,[],[],[],Fs);
 
 %% Spectral substracting noise (powepoint Ludwig)
 N=final-inicio;
-alpha=0.8;
+alpha=0.85;
 p=2;
 r=(max(Signalcortada)-min(Signalcortada))./2
 
@@ -68,7 +68,28 @@ Signal2media(i)=(alpha.*(abs(Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2corta
 Signal2estimada(i)=r.*Signal2cortada(i)./(Signal2estimada(i-1));
 end
 
-Signalestimada(1919990:1920000)
+
+
+%% Percentile noise substraction
+N=final-inicio;
+c=1;
+NFFT=2*N+1;
+S=spectrogram(Signalcortada);
+for i=1:N
+N=prctile(S(i),50);
+Sestimada(i)=max(0,S(i)-c.*N);
+end
+
+S2=spectrogram(Signal2cortada);
+for i=1:N
+N2=prctile(S2(i),50);
+Sestimada2(i)=max(0,S2(i)-c.*N2);
+end
+
+
+
+
+
 
 %% TK--NOOO
 output_tk=teager_kaiser(input);
@@ -85,33 +106,35 @@ linkaxes(ax,'x');
 
 
 %% TDE on  data using xcorr and the maximum peak
-gcc_mode = 'phat';
+gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 
 
 %Xcorr
-xcorr_ballena = xcorr(Signalestimada,Signal2estimada);
+xcorr_ballena = xcorr(Signalcortada,Signal2cortada);
 [val,ind]=max(xcorr_ballena );
-delay_ball2= ind-M
+delay_ball= ind-M
+delay_ball_s=delay_ballgccn/Fs;
 %Gcorr normal
-gcorr_ballena = gcc_marques_nuevo(Signalestimada,Signal2estimada,gcc_mode1);
+gcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode1);
 [val,ind]=max(gcorr_ballena );
-delay_ballgccn2= ind-M
-
+delay_ballgccn= ind-M
+delay_ballgccn_s=delay_ballgccn/Fs;
 %Gcorr phat
-gpcorr_ballena = gcc_marques_nuevo(Signalestimada,Signal2estimada,gcc_mode);
+gpcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode);
 [val,ind]=max(gpcorr_ballena );
-delay_ballgccp2= ind-M
+delay_ballgccp= ind-M
+delay_ballgccp_s=delay_ballgccp/Fs;
 %plot todo 
 if DEBUG
     figure(1)
     plot(xcorr_ballena); title('xcorr between whales');
  
    figure(2)
-    plot(gcorr_ballena); title('gcorr-corr between whales');figure
+    plot(gcorr_ballena); title('gcorr-corr between whales');
     
   figure(3)
-    plot(gpcorr_ballena); title('gcorr phat between whales');
+    plot(gpcorr_ballena); title('gcorr Scot between whales');
 end
 
 

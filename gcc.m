@@ -34,6 +34,16 @@ if(strcmp(flag,'cc'))
 elseif(strcmp(flag,'phat'));
    phi_z1z2 = ifft(Phi_z1z2 ./ max(abs(Phi_z1z2),eps));
    zc = [phi_z1z2(NFFT-M+2:NFFT) phi_z1z2(1:M)];  % re-arrange the vector
+
+elseif(strcmp(flag,'scot'))
+        % Smoothed Coherence Transform (SCOT) 
+        % ----------------------------------------------------------------- 
+        % this processor exhibits the same spreading as the Roth processor. 
+      
+        W=(Phi_z1z1.*Phi_z2z2).^0.5;
+        phi_z1z2 = ifft(Phi_z1z2 .* W);
+        zc = [phi_z1z2(NFFT-M+2:NFFT) phi_z1z2(1:M)];  % re-arrange the vector  
+        
 else
    disp('Invalid value for flag');
 end
