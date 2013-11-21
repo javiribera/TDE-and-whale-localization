@@ -1,6 +1,12 @@
 %cargar señal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
-[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p3.wav');
+[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
+
+%Tiempos
+primerevento_inicial=2880000;
+primerevento_final=3840000;
+segundoevento_inicial=50880000;
+segundoevento_final=51840000;
 
 %calcular lenght, sample freq y sacarlo por pantalla
 [fileLength2,num_channels2]=size(Signal2);
@@ -13,8 +19,10 @@ DEBUG=1;
 Fs=sampling1;
 
 %cortar la señal pq es muy grande
-inicio=50880000;
-final=51840000;
+inicio=primerevento_inicial;
+final=primerevento_final;
+
+
 Signalcortada=Signal(inicio:final);
 Signal2cortada=Signal2(inicio:final);
 M =length(Signalcortada)
@@ -48,25 +56,33 @@ pwelch(real_noise,[],[],[],Fs);
 
 
 
-%% Spectral substracting noise (powepoint Ludwig)
+%% Time Gain substracting noise (powepoint Ludwig)
 N=final-inicio;
-alpha=0.85;
+alpha=0.9;
 p=2;
-r=(max(Signalcortada)-min(Signalcortada))./2
+r=1;
 
     Signalmedia(1)=abs(Signalcortada(1));
     Signalestimada(1)=abs(Signalcortada(1));
 for i=2:N
 Signalmedia(i)=(alpha.*(abs(Signalmedia(i-1)).^p)+(1-alpha).*(abs(Signalcortada(i)).^p)).^(1/p);
-Signalestimada(i)=r.*Signalcortada(i)./(Signalestimada(i-1));
+Signalestimada(i)=r.*max((Signalcortada(i)./Signalestimada(i-1)),eps);
 end
 
  Signal2media(1)=abs(Signal2cortada(1));
     Signal2estimada(1)=abs(Signal2cortada(1));
 for i=2:N
 Signal2media(i)=(alpha.*(abs(Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
-Signal2estimada(i)=r.*Signal2cortada(i)./(Signal2estimada(i-1));
+Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);
 end
+figure(1)  
+specgram(Signalmedia)
+figure(2)  
+specgram(Signalestimada)
+figure(3)  
+specgram(Signalcortada)
+Signalestimada(1:300000)
+
 
 
 
@@ -108,33 +124,43 @@ linkaxes(ax,'x');
 %% TDE on  data using xcorr and the maximum peak
 gcc_mode = 'scot';
 gcc_mode1 = 'cc';
-
+gcc_mode3 = 'phat';
+Signal_a_correlar=Signalestimada;
+Signal_a_correlar2=Signal2estimada;
 
 %Xcorr
-xcorr_ballena = xcorr(Signalcortada,Signal2cortada);
+xcorr_ballena = xcorr(Signal_a_correlar,Signal_a_correlar2);
 [val,ind]=max(xcorr_ballena );
 delay_ball= ind-M
 delay_ball_s=delay_ballgccn/Fs;
 %Gcorr normal
-gcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode1);
+gcorr_ballena = gcc_marques_nuevo(Signal_a_correlar,Signal_a_correlar2,gcc_mode1);
 [val,ind]=max(gcorr_ballena );
 delay_ballgccn= ind-M
-delay_ballgccn_s=delay_ballgccn/Fs;
+delay_ballgccn_cte=delay_ballgccn/Fs;
+%Gcorr scot
+gscorr_ballena = gcc_marques_nuevo(Signal_a_correlar,Signal_a_correlar2,gcc_mode);
+[val,ind]=max(gscorr_ballena );
+delay_ballgccs= ind-M
+delay_ballgcc_scot=delay_ballgccs/Fs;
 %Gcorr phat
-gpcorr_ballena = gcc_marques_nuevo(Signalcortada,Signal2cortada,gcc_mode);
+gpcorr_ballena = gcc_marques_nuevo(Signal_a_correlar,Signal_a_correlar2,gcc_mode3);
 [val,ind]=max(gpcorr_ballena );
 delay_ballgccp= ind-M
-delay_ballgccp_s=delay_ballgccp/Fs;
+delay_ballgcc_phat=delay_ballgccp/Fs;
 %plot todo 
 if DEBUG
     figure(1)
     plot(xcorr_ballena); title('xcorr between whales');
+    
+    figure(4)
+    plot(xcorr_ballena); title('xcorr between whales');
  
    figure(2)
-    plot(gcorr_ballena); title('gcorr-corr between whales');
+    plot(gpcorr_ballena); title('gcorr-phat between whales');
     
   figure(3)
-    plot(gpcorr_ballena); title('gcorr Scot between whales');
+    plot(gscorr_ballena); title('gcorr Scot between whales');
 end
 
 
