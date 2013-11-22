@@ -73,7 +73,7 @@ end
     Signal2estimada(1)=abs(Signal2cortada(1));
 for i=2:N
 Signal2media(i)=(alpha.*(abs(Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
-Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);
+Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);   %AQUI MAL!!! LOOOK
 end
 figure(1)  
 specgram(Signalmedia)
@@ -146,17 +146,28 @@ plot(Signalcortada)
 
 
 
-%% TK--NOOO
-%output_tk=teager_kaiser(input);
+%% TK--USE AFTER THE DENOISING!!!!!
+Signalcortadatk=teager_kaiser(Signalcortada);
+Signal2cortadatk=teager_kaiser(Signalcortada);
 
-%ax(1)=subplot(3,1,1);
-%plot(input);
-%ylabel('Amplitude');
-%ax(2)=subplot(3,1,2);
-%plot(output_tk);
-%set(gca,'ylim',[-0.01 0.01]);
-%ylabel('Amplitude');
-%linkaxes(ax,'x');
+ax(1)=subplot(3,1,1);
+plot(Signalcortada);
+ylabel('Amplitude');
+ax(2)=subplot(3,1,2);
+plot(Signalcortadatk);
+set(gca,'ylim',[-0.01 0.01]);
+ylabel('Amplitude');
+linkaxes(ax,'x');
+
+figure
+ax(1)=subplot(4,1,1);
+plot(Signal2cortada);
+ylabel('Amplitude');
+ax(2)=subplot(4,1,2);
+plot(Signal2cortadatk);
+set(gca,'ylim',[-0.01 0.01]);
+ylabel('Amplitude');
+linkaxes(ax,'x');
 
 
 
@@ -164,14 +175,14 @@ plot(Signalcortada)
 gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 gcc_mode3 = 'phat';
-Signal_a_correlar=Signalestimada;
-Signal_a_correlar2=Signal2estimada;
+Signal_a_correlar=Signalcortadatk;
+Signal_a_correlar2=Signal2cortadatk;
 
 %Xcorr
 xcorr_ballena = xcorr(Signal_a_correlar,Signal_a_correlar2);
 [val,ind]=max(xcorr_ballena );
 delay_ball= ind-M
-delay_ball_s=delay_ballgccn/Fs;
+delay_ball_s=delay_ball/Fs;
 %Gcorr normal
 gcorr_ballena = gcc_marques_nuevo(Signal_a_correlar,Signal_a_correlar2,gcc_mode1);
 [val,ind]=max(gcorr_ballena );
@@ -204,7 +215,32 @@ end
 
 
 
-%% TDE 
+%% TDE Eigenvalue Descomposition
+Signal_a_correlar=Signalcortadatk;
+Signal_a_correlar2=Signal2cortadatk;
+
+R=xcorr(Signal_a_correlar,Signal_a_correlar2);
+[eigenvec,lambda]=eig(R);   %sacar eigenvectors y eigenvalues
+if (length(R)==length(eigenvec))   %mirar que tengan el mismo rango (R y eigenvec)
+    
+   %caso no ruido
+   %Buscar el eigenvalue 0. Entonces coger el
+    %vector de ese eigenvalue sera el chanel response u=(h1,-h0) de la señal
+    %Rx0x1. 
+    %Despues, miramos que h1 y h0 no contengan ningun 0 en comun
+    %finalmente, T=argmax h1,l - argmax h0,l   con valores abs
+    
+    %caso ruido
+    %u(k+1)=   (u(k)-mu*error*x)/(norma(u-mu*error*x))  con norma(u)2=1 con
+    %error=u*x     PROBLEMA DE INICIALIZAR!!! LEER MAÑANA    
+    
+    
+end
+
+    
+   
+    
+    
 
 
 %% DEBUG: no need of aux. variables
