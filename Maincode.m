@@ -56,7 +56,7 @@ M =length(Signalcortada)
 
 
 
-%% Time Gain substracting noise (powepoint Ludwig)
+%% Time Gain normalization substracting noise (powepoint Ludwig)
 N=final-inicio;
 alpha=0.9;
 p=2;
@@ -89,26 +89,58 @@ specgram(Signalcortada)
 %% Percentile noise substraction
 N=final-inicio;
 c=1;
+percentil=90;
+M=length(S);
 
 S=spectrogram(Signalcortada);
-M=length(S)
+S2=spectrogram(Signal2cortada);
 
 for i=1:M
-N=prctile(S(i),50);
-Sestimada(i)=max(0,S(i)-N);
+    for k=1:7
+N=prctile(S(i,k),90);
+Sestimada(i,k)=max(0,S(i,k)-N);
+N2=prctile(S2(i,k),90);
+Sestimada2(i,k)=max(0,S2(i,k)-N);
+    end
 end
-S2=spectrogram(Signal2cortada);
-for i=1:M
-N=prctile(S2(i),50);
-Sestimada2(i)=max(0,S2(i)-N);
-end
-Signalpercentil=ifft(Sestimada);
-Signalpercentil2=ifft(Sestimada2);
+
+%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL
 
 figure(1)
 plot(Sestimada)
 figure(2)
 plot (Sestimada2)
+
+
+
+%% Frequency band normalization
+N=final-inicio;
+c=1;
+Signalresultant=0;
+Sx=spectrogram(Signalcortada);
+Signalresultant2=0;
+Sx2=spectrogram(Signal2cortada);
+M=length(Sx);
+alpha1=0.8;
+for k=1:7
+    Smedia(1,k)=Sx(1,k);
+    Sresultante(1,k)=Sx(1,k)-Smedia(1,k);
+    Smedia2(1,k)=Sx2(1,k);
+    Sresultante2(1,k)=Sx2(1,k)-Smedia2(1,k);
+for i=2:M
+ Smedia(i,k)=alpha1.*Smedia(i-1,k)+(1-alpha1).*Sx(i,k);
+ Sresultante(i,k)=Sx(i,k)-Smedia(i,k);
+ Smedia2(i,k)=alpha1.*Smedia2(i-1,k)+(1-alpha1).*Sx2(i,k);
+ Sresultante2(i,k)=Sx2(i,k)-Smedia2(i,k);
+end
+end
+
+%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL
+
+figure(1) 
+plot(Signalresultant)
+figure(2)
+plot(Signalcortada)
 
 
 
