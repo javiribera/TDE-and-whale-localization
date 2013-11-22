@@ -56,7 +56,7 @@ M =length(Signalcortada)
 
 
 
-%% Time Gain substracting noise (powepoint Ludwig)
+%% Time Gain normalization substracting noise (powepoint Ludwig)
 N=final-inicio;
 alpha=0.9;
 p=2;
@@ -73,7 +73,7 @@ end
     Signal2estimada(1)=abs(Signal2cortada(1));
 for i=2:N
 Signal2media(i)=(alpha.*(abs(Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
-Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);
+Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);   %AQUI MAL!!! LOOOK
 end
 figure(1)  
 specgram(Signalmedia)
@@ -89,21 +89,22 @@ specgram(Signalcortada)
 %% Percentile noise substraction
 N=final-inicio;
 c=1;
+percentil=90;
+M=length(S);
 
 S=spectrogram(Signalcortada);
-M=length(S)
+S2=spectrogram(Signal2cortada);
 
 for i=1:M
-N=prctile(S(i),50);
-Sestimada(i)=max(0,S(i)-N);
+    for k=1:7
+N=prctile(S(i,k),90);
+Sestimada(i,k)=max(0,S(i,k)-N);
+N2=prctile(S2(i,k),90);
+Sestimada2(i,k)=max(0,S2(i,k)-N);
+    end
 end
-S2=spectrogram(Signal2cortada);
-for i=1:M
-N=prctile(S2(i),50);
-Sestimada2(i)=max(0,S2(i)-N);
-end
-Signalpercentil=ifft(Sestimada);
-Signalpercentil2=ifft(Sestimada2);
+
+%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL
 
 figure(1)
 plot(Sestimada)
@@ -112,19 +113,61 @@ plot (Sestimada2)
 
 
 
+%% Frequency band normalization
+N=final-inicio;
+c=1;
+Signalresultant=0;
+Sx=spectrogram(Signalcortada);
+Signalresultant2=0;
+Sx2=spectrogram(Signal2cortada);
+M=length(Sx);
+alpha1=0.8;
+for k=1:7
+    Smedia(1,k)=Sx(1,k);
+    Sresultante(1,k)=Sx(1,k)-Smedia(1,k);
+    Smedia2(1,k)=Sx2(1,k);
+    Sresultante2(1,k)=Sx2(1,k)-Smedia2(1,k);
+for i=2:M
+ Smedia(i,k)=alpha1.*Smedia(i-1,k)+(1-alpha1).*Sx(i,k);
+ Sresultante(i,k)=Sx(i,k)-Smedia(i,k);
+ Smedia2(i,k)=alpha1.*Smedia2(i-1,k)+(1-alpha1).*Sx2(i,k);
+ Sresultante2(i,k)=Sx2(i,k)-Smedia2(i,k);
+end
+end
+
+%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL
+
+figure(1) 
+plot(Signalresultant)
+figure(2)
+plot(Signalcortada)
 
 
-%% TK--NOOO
-%output_tk=teager_kaiser(input);
 
-%ax(1)=subplot(3,1,1);
-%plot(input);
-%ylabel('Amplitude');
-%ax(2)=subplot(3,1,2);
-%plot(output_tk);
-%set(gca,'ylim',[-0.01 0.01]);
-%ylabel('Amplitude');
-%linkaxes(ax,'x');
+
+
+%% TK--USE AFTER THE DENOISING!!!!!
+Signalcortadatk=teager_kaiser(Signalcortada);
+Signal2cortadatk=teager_kaiser(Signalcortada);
+
+ax(1)=subplot(3,1,1);
+plot(Signalcortada);
+ylabel('Amplitude');
+ax(2)=subplot(3,1,2);
+plot(Signalcortadatk);
+set(gca,'ylim',[-0.01 0.01]);
+ylabel('Amplitude');
+linkaxes(ax,'x');
+
+figure
+ax(1)=subplot(4,1,1);
+plot(Signal2cortada);
+ylabel('Amplitude');
+ax(2)=subplot(4,1,2);
+plot(Signal2cortadatk);
+set(gca,'ylim',[-0.01 0.01]);
+ylabel('Amplitude');
+linkaxes(ax,'x');
 
 
 
@@ -132,14 +175,14 @@ plot (Sestimada2)
 gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 gcc_mode3 = 'phat';
-Signal_a_correlar=Signalestimada;
-Signal_a_correlar2=Signal2estimada;
+Signal_a_correlar=Signalcortadatk;
+Signal_a_correlar2=Signal2cortadatk;
 
 %Xcorr
 xcorr_ballena = xcorr(Signal_a_correlar,Signal_a_correlar2);
 [val,ind]=max(xcorr_ballena );
 delay_ball= ind-M
-delay_ball_s=delay_ballgccn/Fs;
+delay_ball_s=delay_ball/Fs;
 %Gcorr normal
 gcorr_ballena = gcc_marques_nuevo(Signal_a_correlar,Signal_a_correlar2,gcc_mode1);
 [val,ind]=max(gcorr_ballena );
@@ -172,7 +215,32 @@ end
 
 
 
-%% TDE 
+%% TDE Eigenvalue Descomposition
+Signal_a_correlar=Signalcortadatk;
+Signal_a_correlar2=Signal2cortadatk;
+
+R=xcorr(Signal_a_correlar,Signal_a_correlar2);
+[eigenvec,lambda]=eig(R);   %sacar eigenvectors y eigenvalues
+if (length(R)==length(eigenvec))   %mirar que tengan el mismo rango (R y eigenvec)
+    
+   %caso no ruido
+   %Buscar el eigenvalue 0. Entonces coger el
+    %vector de ese eigenvalue sera el chanel response u=(h1,-h0) de la señal
+    %Rx0x1. 
+    %Despues, miramos que h1 y h0 no contengan ningun 0 en comun
+    %finalmente, T=argmax h1,l - argmax h0,l   con valores abs
+    
+    %caso ruido
+    %u(k+1)=   (u(k)-mu*error*x)/(norma(u-mu*error*x))  con norma(u)2=1 con
+    %error=u*x     PROBLEMA DE INICIALIZAR!!! LEER MAÑANA    
+    
+    
+end
+
+    
+   
+    
+    
 
 
 %% DEBUG: no need of aux. variables
