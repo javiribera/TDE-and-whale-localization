@@ -28,7 +28,8 @@ function [ delay_secs ] = delay_between_sensors( sensorA, sensorB )
             sensor7;
           ];
     
-    delay_secs = sqrt( sum((sensors(sensorA,:)-sensors(sensorB,:)).^2) );
+    distance = sqrt( sum((sensors(sensorA,:)-sensors(sensorB,:)).^2) );
+    delay_secs = distance/speed;
 
 end
 
