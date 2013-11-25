@@ -1,11 +1,11 @@
 %Load Signal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
-[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
+[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p4.wav');
 
 %Times
-primerevento_inicial=2880000;
-primerevento_final=3840000;
-segundoevento_inicial=50880000;
+primerevento_inicial=13440000;
+primerevento_final=15840000;
+segundoevento_inicial=49920000;
 segundoevento_final=51840000;
 
 %¡ lenght, sample freq and print
@@ -19,8 +19,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=primerevento_inicial;
-final=primerevento_final;
+inicio=segundoevento_inicial;
+final=segundoevento_final;
 
 
 Signalcortada=Signal(inicio:final);
@@ -62,17 +62,17 @@ alpha=0.9;
 p=2;
 r=1;
 
-    Signalmedia(1)=abs(Signalcortada(1));
-    Signalestimada(1)=abs(Signalcortada(1));
+    Signalmedia(1)=(Signalcortada(1));
+    Signalestimada(1)=(Signalcortada(1));
 for i=2:N
-Signalmedia(i)=(alpha.*(abs(Signalmedia(i-1)).^p)+(1-alpha).*(abs(Signalcortada(i)).^p)).^(1/p);
+Signalmedia(i)=(alpha.*((Signalmedia(i-1)).^p)+(1-alpha).*(abs(Signalcortada(i)).^p)).^(1/p);
 Signalestimada(i)=r.*max((Signalcortada(i)./Signalestimada(i-1)),eps);
 end
 
  Signal2media(1)=abs(Signal2cortada(1));
     Signal2estimada(1)=abs(Signal2cortada(1));
 for i=2:N
-Signal2media(i)=(alpha.*(abs(Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
+Signal2media(i)=(alpha.*((Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
 Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);   %AQUI MAL!!! LOOOK
 end
 figure(1)  
@@ -175,8 +175,8 @@ linkaxes(ax,'x');
 gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 gcc_mode3 = 'phat';
-Signal_a_correlar=Signalcortadatk;
-Signal_a_correlar2=Signal2cortadatk;
+Signal_a_correlar=Signalestimada;
+Signal_a_correlar2=Signal2estimada;
 
 %Xcorr
 xcorr_ballena = xcorr(Signal_a_correlar,Signal_a_correlar2);
@@ -204,7 +204,7 @@ if DEBUG
     plot(xcorr_ballena); title('xcorr between whales');
     
     figure(4)
-    plot(xcorr_ballena); title('xcorr between whales');
+    plot(gcorr_ballena); title('gcorr between whales');
  
    figure(2)
     plot(gpcorr_ballena); title('gcorr-phat between whales');
