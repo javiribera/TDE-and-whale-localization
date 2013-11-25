@@ -1,13 +1,7 @@
-% Source from Thierry Dutoit, Ferran Marquès, 
-%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
-%   Springer:New-York, 2009
-
 function y = teager_kaiser(x)
 
 % y = teager_kaiser(x) applies the Teager-Kaiser energy operator to
-%   input signal x.
-% Useful to clean impulsive signals (such as clicks)
-%   from noise and interference
+% input signal x.
 
 x=x(:); % Setting x as a column vector
 

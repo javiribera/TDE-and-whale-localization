@@ -3,7 +3,7 @@ function output = clean_signal( input )
 %   This is the function that will pre-process the signal so that detection
 %   will be easier: frequency filter, noise-reduction...
     
-    %% IN PROGRESS
+    %% FILTER PASS-BAND
 
     Fs=96e3; % 96 KHz
     
@@ -28,9 +28,9 @@ function output = clean_signal( input )
         signal2 = sosfilt(Hd.sosMatrix,signal1);
         % DEBUG: visualize the frequency response of the filter
         % fvtool(Hd);
-        % signal2=signal1;
+         
         
-        % 3. Time-domain gain normalization
+        % 3. TIME GAIN NORMALIZATION
         alpha = 0.9;
         p = 2;
         r = 1; % output overall power level
@@ -40,20 +40,81 @@ function output = clean_signal( input )
             aver_level(n) = ( alpha*(aver_level(n-1))^p + (1-alpha)*abs(signal2(n))^p )^(1/p);
             signal3(n) = r * signal2(n) / aver_level(n-1);
         end
+         output=signal3;
+            
+     %% 3 TIME GAIN NORMALIZATION
+        % 3. TIME GAIN NORMALIZATION
+       % alpha = 0.9;
+        %p = 2;
+        %r = 1; % output overall power level
+        %aver_level(1) = signal2(1);
+        %signal3(1) = signal2(1);
+        %for n=2:length(signal2)
+         %   aver_level(n) = ( alpha*(aver_level(n-1))^p + (1-alpha)*abs(signal2(n))^p )^(1/p);
+          %  signal3(n) = r * signal2(n) / aver_level(n-1);
+        %end
+         %output=signal3;
         
-        
-        %% 4. Percentile noise substraction
+        %% 4. Percentile noise substraction- ENPROCESO
         % NOT TESTED
+    
+%c=1;
+%percentil=90;
+
+
+%S=spectrogram(input);
+%M=length(S);
 %         for i=1:M
 %             for k=1:7
-%                 percentil=prctile(S(i,k),90);
+%                N=prctile(S(i,k),90);
 %                 Sestimada(i,k)=max(0,S(i,k)-N);
-%                 N2=prctile(S2(i,k),90);
-%                 Sestimada2(i,k)=max(0,S2(i,k)-N);
+%                 
 %             end
 %         end
-        
-    output=signal3;
+    %    ANTITRANSFORMAR SESTIMADA EN SIGNAL3
+   
+    
+    
+%% 5 Frequency band normalization-- EN PROCESO!
+
+%c=1;
+%Signalresultant=0;
+%Sx=spectrogram(input);
+%M=length(Sx);
+%alpha1=0.8;
+%for k=1:7
+ %   Smedia(1,k)=Sx(1,k);
+  %  Sresultante(1,k)=Sx(1,k)-Smedia(1,k);
+    
+%for i=2:M
+ %Smedia(i,k)=alpha1.*Smedia(i-1,k)+(1-alpha1).*Sx(i,k);
+ %Sresultante(i,k)=Sx(i,k)-Smedia(i,k);
+ 
+%end
+%end
+
+%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL Y SIGNAL 4 TO OUTPUT
+
+%output=signal4;
+
+
+
+
+
+%% 6 TK-- EN PROCESO-----USE AFTER THE DENOISING!!!!!
+
+Signalcortadatk=teager_kaiser(input);
+
+
+%ax(1)=subplot(3,1,1);
+%plot(input);
+%ylabel('Amplitude');
+%ax(2)=subplot(3,1,2);
+%plot(Signalcortadatk);
+%set(gca,'ylim',[-0.01 0.01]);
+%ylabel('Amplitude');
+%linkaxes(ax,'x');
+
 
 
 end
