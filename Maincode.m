@@ -19,8 +19,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=segundoevento_inicial;
-final=segundoevento_final;
+inicio=primerevento_inicial;
+final=primerevento_final;
 
 
 Signalcortada=Signal(inicio:final);
@@ -176,8 +176,8 @@ plot(Signalcortada)
 
 
 %% TK--USE AFTER THE DENOISING!!!!!
-Signalcortadatk=teager_kaiser(Signalcortada);
-Signal2cortadatk=teager_kaiser(Signalcortada);
+Signalcortadatk=teager_kaiser(Signalestimada);
+Signal2cortadatk=teager_kaiser(Signal2estimada);
 
 ax(1)=subplot(3,1,1);
 plot(Signalcortada);
