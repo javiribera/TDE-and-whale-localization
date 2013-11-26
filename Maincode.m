@@ -1,6 +1,6 @@
 %Load Signal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
-[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p3.wav');
+[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
 
 %Times
 primerevento_inicial=13440000;
@@ -19,14 +19,25 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=primerevento_inicial;
-final=primerevento_final;
+inicio=segundoevento_inicial;
+final=segundoevento_final;
 
 
 Signalcortada=Signal(inicio:final);
 Signal2cortada=Signal2(inicio:final);
 M =length(Signalcortada)
 
+
+%%
+% Let us compute the PSD of the background noise in hydrophone #3, for
+% later use. It appears that the noise is pink, 
+L=96000*110;
+L2=L+960000;
+real_noise=Signal(L:L2);
+real_noise_std=std(real_noise)
+
+clf;
+pwelch(real_noise,[],[],[],Fs);
 %% FILTER OF XAVI!
 
 %Mirar la señal--NOOOOO
@@ -78,12 +89,20 @@ M =length(Signalcortada)
        signal1 = Signal2cortada - mean(Signal2cortada);
         signal2 = sosfilt(Hd.sosMatrix,signal1);
         Signal2cortada=signal2;
+        
+        figure(1)  
+plot(Signalcortada)
+figure(2)  
+plot(Signal2cortada)
+        
 
 %% Time Gain norma
 
 Signalcortada=time_gain(Signalcortada);
 Signal2cortada=time_gain(Signal2cortada);
 
+figure  
+specgram(Signalcortada)
 
         %% Time Gain normalization substracting noise (powepoint Ludwig)
 N=final-inicio;
@@ -176,15 +195,14 @@ plot(Signalcortada)
 
 
 %% TK--USE AFTER THE DENOISING!!!!!
-Signalcortadatk=teager_kaiser(Signalestimada);
-Signal2cortadatk=teager_kaiser(Signal2estimada);
+Signalcortadatk=teager_kaiser(Signalcortada);
+Signal2cortadatk=teager_kaiser(Signal2cortada);
 
 ax(1)=subplot(3,1,1);
 plot(Signalcortada);
 ylabel('Amplitude');
 ax(2)=subplot(3,1,2);
 plot(Signalcortadatk);
-set(gca,'ylim',[-0.01 0.01]);
 ylabel('Amplitude');
 linkaxes(ax,'x');
 
@@ -194,7 +212,6 @@ plot(Signal2cortada);
 ylabel('Amplitude');
 ax(2)=subplot(4,1,2);
 plot(Signal2cortadatk);
-set(gca,'ylim',[-0.01 0.01]);
 ylabel('Amplitude');
 linkaxes(ax,'x');
 

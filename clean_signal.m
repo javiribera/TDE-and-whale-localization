@@ -38,7 +38,7 @@ function output = clean_signal( input )
         signal3(1) = signal2(1);
         for n=2:length(signal2)
             aver_level(n) = ( alpha*(aver_level(n-1))^p + (1-alpha)*abs(signal2(n))^p )^(1/p);
-            signal3(n) = r * signal2(n) / aver_level(n-1);
+            signal3(n) = r * signal2(n) / signal3(n-1);
         end
          output=signal3;
             
@@ -51,7 +51,7 @@ function output = clean_signal( input )
         %signal3(1) = signal2(1);
         %for n=2:length(signal2)
          %   aver_level(n) = ( alpha*(aver_level(n-1))^p + (1-alpha)*abs(signal2(n))^p )^(1/p);
-          %  signal3(n) = r * signal2(n) / aver_level(n-1);
+          %  signal3(n) = r * signal2(n) / signal3(n-1);
         %end
          %output=signal3;
         
