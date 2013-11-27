@@ -3,7 +3,7 @@ function output = percentile( input,percentil,Fs)
 %% 4. Percentile noise substraction- ENPROCESO
 
 gamma=2;
-c=1;
+c=5;
 
 Window_length=(Fs*0.15);   %150 ms
 Window_overlap=(Fs*0.075);    %75 ms
@@ -22,31 +22,13 @@ N(k)=prctile(abs(S(k,:)),percentil);     %calcular el percentil de cada freq ban
 
 
    end
-%for k=1:Window_length
-    
- %  index1=(k-1)*(Window_overlap)+1;
-  % index2=(k-1)*(Window_overlap)+Window_length;
-   %Frame=input(index1:index2);
-   %WindowedFrame=Frame.*Window;
-   %FrameFFT=fft(WindowedFrame);
-   %FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
-   %N(k)=prctile(FrameSpec(k),percentil); % Averaging
-%end
-    
+
     
   for i=1:(NumOfFrames-1)
    index1=(i-1)*(Window_overlap)+1;
    index2=(i-1)*(Window_overlap)+Window_length;
     FramePhase=angle(S(:,i));  %calcular la fase de S para luego reconstruir
    
-   %Frame=Signalcortada(index1:index2);
-   %WindowedFrame=Frame.*Window;
-   %FrameFFT=fft(WindowedFrame,NFFT);
-   %FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length); % Frame periodogram
-   %FramePhase=angle(FrameFFT); % Save the phase function
-  % FrameSpec=((abs(S(:,i))))*(1/Window_length); % Frame periodogram
-   %FramePhase(i)=angle(S(:,i)); % Save the phase function
-      %  FrameSpec=max(FrameSpec-N,0);
       
          FrameSpec=max(abs(S(:,i))-c.*N',0);   %Restar el vector N en S
          
@@ -62,4 +44,42 @@ N(k)=prctile(abs(S(k,:)),percentil);     %calcular el percentil de cada freq ban
    output=ProcessedSignal;
   % Notice the frames are 50% overlapped
   end
+  %%
+  
+  %%PERCENTILE CURVE
+
+%L=floor(length(T)/2);
+ %for j=1:100
+  %      resultado(j)=prctile(S(L,:),j);
+% end
+ %resultado=abs(resultado);
+    %PLOT ALL
+%figure()
+%plot(resultado);
+%ylabel('Spectrogrmvalue');
+%xlabel('percentil');
+  
+  %% BASURA QUE PUEDE SER UTIL EN EL FUTURO
+  %
+  %for k=1:Window_length
+    
+ %  index1=(k-1)*(Window_overlap)+1;
+  % index2=(k-1)*(Window_overlap)+Window_length;
+   %Frame=input(index1:index2);
+   %WindowedFrame=Frame.*Window;
+   %FrameFFT=fft(WindowedFrame);
+   %FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
+   %N(k)=prctile(FrameSpec(k),percentil); % Averaging
+%end
+
+
+ %Frame=Signalcortada(index1:index2);
+   %WindowedFrame=Frame.*Window;
+   %FrameFFT=fft(WindowedFrame,NFFT);
+   %FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length); % Frame periodogram
+   %FramePhase=angle(FrameFFT); % Save the phase function
+  % FrameSpec=((abs(S(:,i))))*(1/Window_length); % Frame periodogram
+   %FramePhase(i)=angle(S(:,i)); % Save the phase function
+      %  FrameSpec=max(FrameSpec-N,0);
+    
 end

@@ -19,8 +19,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=segundoevento_inicial;
-final=segundoevento_final;
+inicio=primerevento_inicial;
+final=primerevento_final;
 
 
 Signalcortada=Signal(inicio:final);
@@ -122,7 +122,6 @@ Signal2procesada=percentile(Signal2cortada,90,Fs);
   
   
 
-
 %% Frequency band normalization
 Signalresultant=freq_band(Signalcortada,Fs);
 Signal2resultant=freq_band(Signal2cortada,Fs);
@@ -205,14 +204,61 @@ if DEBUG
 end
 
 
+%%
+
+% We run the adaptive filtering algorithm for TDOA estimation within [-600,600]
+% (samples) and step |mu|=0.01 (for full scale signals in [-1,+1]).
+
+% Normalizing max signal amplitudes to +1
+x1=signal_1_tk/max(signal_1_tk);
+x2=signal_2_tk/max(signal_2_tk);
+
+% LMS initialization
+M = 600; % max value of the estimated TDOA
+x1c = zeros(M,1);
+x2c = zeros(M,1);
+u = zeros(2*M,1);
+u(M/2) = 1;
+N = length(x1);
+e = zeros(1,N);
+tdoa = zeros(1,N);
+peak = zeros(1,N);
+mu = 0.01; % LMS step
+
+% LMS loop
+for n=1:N
+    
+    x1c = [x1(n);x1c(1:length(x1c)-1)];
+    x2c = [x2(n);x2c(1:length(x2c)-1)];
+    x = [x1c;x2c];
+    
+    e(n) = u'*x;
+    u = u-mu*e(n)*x;
+    u(M/2) = 1; %forcing g2 to an impulse response at M/2
+    u = u/norm(u); %forcing ||u|| to 1
+    
+    [peak(n),ind] = min(u(M+1:end));
+    peak(n)=-peak(n); % find the value of the (positive) impulse
+    TDOA(n) = ind-M/2;
+    
+end
+
+% Estimated TDOA as a function of time, with values of the peak in h1
+subplot(2,1,1);
+plot(TDOA);
+xlabel('Time (samples)'); ylabel('TDOA (samples)');
+subplot(2,1,2);
+plot(peak);
+xlabel('Time (samples)'); ylabel('peak');
 
 %% TDE Eigenvalue Descomposition
-Signal_a_correlar=Signalcortadatk;
-Signal_a_correlar2=Signal2cortadatk;
+Signal_a_correlar=Signalcortada;
+Signal_a_correlar2=Signal2cortada;
 
-R=xcorr(Signal_a_correlar,Signal_a_correlar2);
+R=toeplitz(Signal_a_correlar,Signal_a_correlar2);
 [eigenvec,lambda]=eig(R);   %sacar eigenvectors y eigenvalues
 if (length(R)==length(eigenvec))   %mirar que tengan el mismo rango (R y eigenvec)
+    
     
    %caso no ruido
    %Buscar el eigenvalue 0. Entonces coger el
