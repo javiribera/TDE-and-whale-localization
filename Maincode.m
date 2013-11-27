@@ -19,8 +19,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=segundoevento_inicial;
-final=segundoevento_final;
+inicio=primerevento_inicial;
+final=primerevento_final;
 
 
 Signalcortada=Signal(inicio:final);
@@ -104,62 +104,22 @@ Signal2cortada=time_gain(Signal2cortada);
 figure  
 specgram(Signalcortada)
 
-        %% Time Gain normalization substracting noise (powepoint Ludwig)
-N=final-inicio;
-alpha=0.9;
-p=2;
-r=1;
-
-    Signalmedia(1)=(Signalcortada(1));
-    Signalestimada(1)=(Signalcortada(1));
-for i=2:N
-Signalmedia(i)=(alpha.*((Signalmedia(i-1)).^p)+(1-alpha).*(abs(Signalcortada(i)).^p)).^(1/p);
-Signalestimada(i)=r.*max((Signalcortada(i)./Signalestimada(i-1)),eps);
-end
-
- Signal2media(1)=(Signal2cortada(1));
-    Signal2estimada(1)=(Signal2cortada(1));
-for i=2:N
-Signal2media(i)=(alpha.*((Signal2media(i-1)).^p)+(1-alpha).*(abs(Signal2cortada(i)).^p)).^(1/p);
-Signal2estimada(i)=r.*max((Signal2cortada(i)./Signal2estimada(i-1)),eps);   %AQUI MAL!!! LOOOK
-end
-figure(1)  
-specgram(Signalmedia)
-figure(2)  
-specgram(Signalestimada)
-figure(3)  
-specgram(Signalcortada)
 
 
 
-
-
-%% Percentile noise substraction
-
-c=1;
-percentil=90;
-
-
-S=spectrogram(Signalcortada);
-S2=spectrogram(Signal2cortada);
-M=length(S);
-for i=1:M
-    for k=1:7
-N=prctile(S(i,k),90);
-Sestimada(i,k)=max(0,S(i,k)-N);
-N2=prctile(S2(i,k),90);
-Sestimada2(i,k)=max(0,S2(i,k)-N);
-    end
-end
-
-%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL
+%%
+%Percentil con funcion
+Signalprocesada=percentile(Signalcortada,50,Fs);
+Signal2procesada=percentile(Signal2cortada,50,Fs);
 
 figure(1)
-plot(Sestimada)
+plot(Signalprocesada)
 figure(2)
-plot (Sestimada2)
-
-
+plot(Signalcortada)
+figure(3) 
+specgram(Signalprocesada)
+figure(4) 
+specgram(Signalcortada)
 
 %% Frequency band normalization
 N=final-inicio;
@@ -221,8 +181,8 @@ linkaxes(ax,'x');
 gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 gcc_mode3 = 'phat';
-Signal_a_correlar=Signalcortada;
-Signal_a_correlar2=Signal2cortada;
+Signal_a_correlar=Signalprocesada;
+Signal_a_correlar2=Signal2procesada;
 
 %Xcorr
 xcorr_ballena = xcorr(Signal_a_correlar,Signal_a_correlar2);
