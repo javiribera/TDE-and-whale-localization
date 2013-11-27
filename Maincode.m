@@ -19,8 +19,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=primerevento_inicial;
-final=primerevento_final;
+inicio=segundoevento_inicial;
+final=segundoevento_final;
 
 
 Signalcortada=Signal(inicio:final);
@@ -28,19 +28,17 @@ Signal2cortada=Signal2(inicio:final);
 M =length(Signalcortada)
 
 
-%%
-% Let us compute the PSD of the background noise in hydrophone #3, for
+%% BACKGROUND NOISE
+% Let us compute the PSD of the background noise in Signalcortada, for
 % later use. It appears that the noise is pink, 
-L=96000*110;
-L2=L+960000;
-real_noise=Signal(L:L2);
+L=1;
+L2=560000;
+real_noise=Signalcortada(L:L2);
 real_noise_std=std(real_noise)
 
 clf;
 pwelch(real_noise,[],[],[],Fs);
-%% FILTER OF XAVI!
-
-%Mirar la señal--NOOOOO
+%% FILTER FROM 1Khz to 12Khz
 
 %clear ax;
 %cortada=0.33*length(Signal);
@@ -96,7 +94,7 @@ figure(2)
 plot(Signal2cortada)
         
 
-%% Time Gain norma
+%% Time Gain normalization
 
 Signalcortada=time_gain(Signalcortada);
 Signal2cortada=time_gain(Signal2cortada);
@@ -108,43 +106,28 @@ specgram(Signalcortada)
 
 
 %%
-%Percentil con funcion
-Signalprocesada=percentile(Signalcortada,50,Fs);
-Signal2procesada=percentile(Signal2cortada,50,Fs);
+%PERCENTIL NOISE REMOVAL
+Signalprocesada=percentile(Signalcortada,90,Fs);
+Signal2procesada=percentile(Signal2cortada,90,Fs);
 
-figure(1)
-plot(Signalprocesada)
-figure(2)
-plot(Signalcortada)
-figure(3) 
-specgram(Signalprocesada)
-figure(4) 
-specgram(Signalcortada)
+%figure(1)
+%plot(Signalprocesada)
+%figure(2)
+%plot(Signalcortada)
+%igure(3) 
+%specgram(Signalprocesada)
+%figure(4) 
+%specgram(Signalcortada)
+
+  
+  
+
 
 %% Frequency band normalization
-N=final-inicio;
-c=1;
-Signalresultant=0;
-Sx=spectrogram(Signalcortada);
-Signalresultant2=0;
-Sx2=spectrogram(Signal2cortada);
-M=length(Sx);
-alpha1=0.8;
-for k=1:7
-    Smedia(1,k)=Sx(1,k);
-    Sresultante(1,k)=Sx(1,k)-Smedia(1,k);
-    Smedia2(1,k)=Sx2(1,k);
-    Sresultante2(1,k)=Sx2(1,k)-Smedia2(1,k);
-for i=2:M
- Smedia(i,k)=alpha1.*Smedia(i-1,k)+(1-alpha1).*Sx(i,k);
- Sresultante(i,k)=Sx(i,k)-Smedia(i,k);
- Smedia2(i,k)=alpha1.*Smedia2(i-1,k)+(1-alpha1).*Sx2(i,k);
- Sresultante2(i,k)=Sx2(i,k)-Smedia2(i,k);
-end
-end
+Signalresultant=freq_band(Signalcortada,Fs);
+Signal2resultant=freq_band(Signal2cortada,Fs);
 
-%ANTITRANSFORM OF SPECTROGRAM TO SIGNAL
-
+%PLOT ALL
 figure(1) 
 plot(Signalresultant)
 figure(2)
@@ -154,26 +137,27 @@ plot(Signalcortada)
 
 
 
-%% TK--USE AFTER THE DENOISING!!!!!
+%% TK FILTER
 Signalcortadatk=teager_kaiser(Signalcortada);
 Signal2cortadatk=teager_kaiser(Signal2cortada);
 
-ax(1)=subplot(3,1,1);
-plot(Signalcortada);
-ylabel('Amplitude');
-ax(2)=subplot(3,1,2);
-plot(Signalcortadatk);
-ylabel('Amplitude');
-linkaxes(ax,'x');
+%PLOT ALL
+%ax(1)=subplot(3,1,1);
+%plot(Signalcortada);
+%ylabel('Amplitude');
+%ax(2)=subplot(3,1,2);
+%plot(Signalcortadatk);
+%ylabel('Amplitude');
+%linkaxes(ax,'x');
 
-figure
-ax(1)=subplot(4,1,1);
-plot(Signal2cortada);
-ylabel('Amplitude');
-ax(2)=subplot(4,1,2);
-plot(Signal2cortadatk);
-ylabel('Amplitude');
-linkaxes(ax,'x');
+%figure
+%ax(1)=subplot(4,1,1);
+%plot(Signal2cortada);
+%ylabel('Amplitude');
+%ax(2)=subplot(4,1,2);
+%plot(Signal2cortadatk);
+%ylabel('Amplitude');
+%linkaxes(ax,'x');
 
 
 
@@ -204,7 +188,8 @@ gpcorr_ballena = gcc_marques_nuevo(Signal_a_correlar,Signal_a_correlar2,gcc_mode
 [val,ind]=max(gpcorr_ballena );
 delay_ballgccp= ind-M
 delay_ballgcc_phat=delay_ballgccp/Fs;
-%plot todo 
+
+%plot ALL 
 if DEBUG
     figure(1)
     plot(xcorr_ballena); title('xcorr between whales');
