@@ -121,8 +121,30 @@ Signal2procesada=percentile(Signal2cortada,90,Fs);
 
   
   
+%%
+gamma=2;
+c=5;
 
+Window_length=(Fs*0.15);   %150 ms
+Window_overlap=(Fs*0.075);    %75 ms
+NFFT=1024;
+NumOfFrames=floor(length(Signalcortada)/Window_overlap);
+Window=hann(Window_length); % A Hann window is chosen
+windowEnergy=sum(Window.^gamma);
+Window=Window.*sqrt(Window_length/windowEnergy); % Normalization of the window 
 
+ 
+[S,F,T]=spectrogram(Signalcortada,Window_length,Window_overlap,NFFT,Fs); 
+L=floor(length(T)/1.2);
+ for j=1:100
+        resultado(j)=prctile(S(L,:),j);
+ end
+ resultado=abs(resultado);
+    %PLOT ALL
+figure()
+plot(resultado);
+ylabel('Spectrogrmvalue');
+xlabel('percentil');
 %% Frequency band normalization
 Signalresultant=freq_band(Signalcortada,Fs);
 Signal2resultant=freq_band(Signal2cortada,Fs);
