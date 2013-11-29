@@ -19,8 +19,8 @@ DEBUG=1;
 Fs=sampling1;
 
 %Cut the SIGNAL
-inicio=primerevento_inicial;
-final=primerevento_final;
+inicio=segundoevento_inicial;
+final=segundoevento_final;
 
 
 Signalcortada=Signal(inicio:final);
@@ -100,28 +100,108 @@ Signalcortada=time_gain(Signalcortada);
 Signal2cortada=time_gain(Signal2cortada);
 
 figure  
-specgram(Signalcortada)
+specgram(Signalcortada,1024,Fs,556);
 
 
 
 
 %%
 %PERCENTIL NOISE REMOVAL
-Signalprocesada=percentile(Signalcortada,90,Fs);
-Signal2procesada=percentile(Signal2cortada,90,Fs);
+Signalprocesada=percentile(Signalcortada,90,Fs,5);
+Signal2procesada=percentile(Signal2cortada,90,Fs,5);
 
-%figure(1)
-%plot(Signalprocesada)
-%figure(2)
-%plot(Signalcortada)
-%igure(3) 
-%specgram(Signalprocesada)
-%figure(4) 
-%specgram(Signalcortada)
+figure(1)
+plot(Signalprocesada)
+figure(2)
+plot(Signalcortada)
+figure(3) 
+specgram(Signalprocesada,1024,Fs)
+figure(4) 
+specgram(Signalcortada,1024,Fs)
 
   
-  
+%%
 
+gamma=2;
+c=5;
+Window_length=(Fs*0.15);   %150 ms
+Window_overlap=(Fs*0.075);    %75 ms
+NFFT=2048;
+Noise_Frames=Signalcortada(1:480000);    %The first 5 second of the simulation! It is noise!
+NumOfFrames=floor(length(Signalcortada)/Window_overlap);
+NumOfNoiseFrames=floor(length(Noise_Frames)/Window_overlap);
+Window=hann(Window_length); % A Hann window is chosen
+windowEnergy=sum(Window.^gamma);
+Window=Window.*sqrt(Window_length/windowEnergy); % Normalization of the window 
+
+ProcessedSignal=zeros(length(Signalcortada),1);  
+ 
+for k=1:NumOfNoiseFrames-1   %Estimate the NOISE SPECTROGRAM
+    
+   index1=(k-1)*(Window_overlap)+1;
+   index2=(k-1)*(Window_overlap)+Window_length;
+   Frame=Noise_Frames(index1:index2);
+   WindowedFrame=Frame.*Window;
+   FrameFFT=fft(WindowedFrame);
+   FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
+   S(:,k)=FrameSpec;    
+end
+
+F=length(FrameFFT);
+    for i=1:F
+    N(i)=prctile(abs(S(i,:)),90);     %Calculate the percentile vector of the NOISE FRAMES
+   end
+
+    for k=1:NumOfFrames-1     %Calculating the signal spectrogram
+    
+   index1=(k-1)*(Window_overlap)+1;
+   index2=(k-1)*(Window_overlap)+Window_length;
+   Frame=Signalcortada(index1:index2);
+   WindowedFrame=Frame.*Window;
+   FrameFFT=fft(WindowedFrame);
+   FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
+   Sx(:,k)=FrameSpec;    
+   
+    end
+
+    
+  for i=1:(NumOfFrames-1)                        %Substract the Percentile process!
+   index1=(i-1)*(Window_overlap)+1;
+   index2=(i-1)*(Window_overlap)+Window_length;
+    FramePhase=angle(Sx(:,i));  %cCalculate the phase to reconstruct
+   
+      
+         FrameSpec=max(abs(Sx(:,i))-c.*N',0);   %Substract the Percentile
+         
+        
+         
+% Re-synthesize the cleaned speech frame using the phase of the noisy frame   
+   FrameOutputFFT= sqrt(FrameSpec).*cos(FramePhase) +...
+       i.*sqrt(FrameSpec).*sin(FramePhase);
+   FrameOutput=real(ifft(FrameOutputFFT,Window_length)).*sqrt(Window_length);
+   
+   ProcessedSignal(index1:index2)= ProcessedSignal(index1:index2) +...
+       FrameOutput;
+  
+    
+  % Notice the frames are 50% overlapped
+  end
+  output=ProcessedSignal;
+  
+  figure
+   plot(output)
+   figure
+   specgram(output,1024,Fs,556);
+  % spectrogram(output,Window,Window_overlap,NFFT);
+   figure
+   plot(Signalcortada)
+   figure
+   specgram(Signalcortada,1024,Fs,556);
+   %spectrogram(Signalcortada,Window,Window_overlap,NFFT);
+
+   %%
+   
+   sounsc(output,Fs)
 %% Frequency band normalization
 Signalresultant=freq_band(Signalcortada,Fs);
 Signal2resultant=freq_band(Signal2cortada,Fs);
@@ -205,6 +285,7 @@ end
 
 
 %%
+%NOTHING!! FOR ME (TEMPORAL)
 
 % We run the adaptive filtering algorithm for TDOA estimation within [-600,600]
 % (samples) and step |mu|=0.01 (for full scale signals in [-1,+1]).
