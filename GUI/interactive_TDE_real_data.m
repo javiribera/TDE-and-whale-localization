@@ -167,6 +167,10 @@ function tdoa(handles,where)
     end
     if(get(handles.spectral_substraction_option,'Value')==1)
         preprocessing_methods{end+1} = 'spectral_substraction';
+        spectral_substraction_params = struct('alpha',str2num(get(handles.alpha_text,'String')),...
+                                    'beta',str2num(get(handles.beta_text,'String')));
+    else
+        spectral_substraction_params = [];
     end
     if(get(handles.percentile_option,'Value')==1)
         preprocessing_methods{end+1} = 'percentile';
@@ -177,8 +181,8 @@ function tdoa(handles,where)
     end
     
     % preprocess signals
-    preprocessed_signal1 = clean_signal(data1, preprocessing_methods, percentile_params);
-    preprocessed_signal2 = clean_signal(data2, preprocessing_methods, percentile_params);
+    preprocessed_signal1 = clean_signal(data1, preprocessing_methods, percentile_params, spectral_substraction_params);
+    preprocessed_signal2 = clean_signal(data2, preprocessing_methods, percentile_params, spectral_substraction_params);
 
     % get selected method in the GUI
     method_options = cellstr(get(handles.tdoa_options,'String'));

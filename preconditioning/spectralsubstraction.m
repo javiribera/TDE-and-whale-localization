@@ -1,12 +1,14 @@
-function output = spectralsubstraction(input,Fs,alpha,beta)
+function output = spectralsubstraction(input,signal_substraction_params)
 
   %% SPECTRAL SUBSTRACTION
-  
+  global Fs;
+  alpha = signal_substraction_params.alpha;
+  beta = signal_substraction_params.beta;
   gamma=2; % Exponent of magnitude spectrum
 frameShiftDuration=10; % in ms
 frameDuration=20; % in ms
 initialNoiseDuration=1000; 
-numNoiseSamples=initialNoiseDuration*Fs/1000;w % Number of silence
+numNoiseSamples=initialNoiseDuration*Fs/1000; % Number of silence
 % samples used to estimate the noise spectrum  
 
 % Initialization of the frame-based processing:
@@ -37,7 +39,7 @@ for k=1:numNoiseFrames
 end
 
 
-figure(2); plot(NoiseSpec(1:frameLength/2+1));
+% figure(2); plot(NoiseSpec(1:frameLength/2+1));
 
 % Working frame-by-frame, subtract the noise spectrum estimate from the 
 % noisy speech spectrum, with the usual spectral subtraction equations. 
