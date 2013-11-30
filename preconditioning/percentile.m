@@ -1,7 +1,9 @@
-function output = percentile( input,percentil,Fs,c)
+function output = percentile(input,percentile_params)
 
 %% Percentile noise substraction- ENPROCESO
-
+global Fs;
+percentil = percentile_params.percentil;
+c = percentile_params.c;
 gamma=2;
 
 Window_length=(Fs*0.075);   %75 ms
