@@ -112,8 +112,8 @@ function load_data_Callback(hObject, eventdata, handles)
     global data1_FileName data1_PathName;
     global data2_FileName data2_PathName;
     global data1 data2 Fs;
-    [data1,Fs]=audioread([data1_PathName,data1_FileName]);
-    [data2,Fs]=audioread([data2_PathName,data2_FileName]);
+    [data1,Fs]=wavread([data1_PathName,data1_FileName]);
+    [data2,Fs]=wavread([data2_PathName,data2_FileName]);
     data1 = data1(Ti*Fs :  Tf*Fs);
     data2 = data2(Ti*Fs :  Tf*Fs);
     
