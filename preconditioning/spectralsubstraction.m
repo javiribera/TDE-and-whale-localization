@@ -1,12 +1,12 @@
 function output = spectralsubstraction(input,Fs,alpha,beta)
 
-  %%
+  %% SPECTRAL SUBSTRACTION
   
   gamma=2; % Exponent of magnitude spectrum
 frameShiftDuration=10; % in ms
 frameDuration=20; % in ms
 initialNoiseDuration=1000; 
-numNoiseSamples=initialNoiseDuration*Fs/1000;; % Number of silence
+numNoiseSamples=initialNoiseDuration*Fs/1000;w % Number of silence
 % samples used to estimate the noise spectrum  
 
 % Initialization of the frame-based processing:

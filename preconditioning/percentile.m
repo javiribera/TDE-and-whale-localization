@@ -1,6 +1,6 @@
 function output = percentile( input,percentil,Fs,c)
 
-%% 4. Percentile noise substraction- ENPROCESO
+%% Percentile noise substraction- ENPROCESO
 
 gamma=2;
 

@@ -1,6 +1,6 @@
 function output = freq_band( input )
 
-%% 5 Frequency band normalization-- EN PROCESO!
+%% Frequency band normalization-- EN PROCESO!
 
 %c=1;
 %Signalresultant=0;
