@@ -1,31 +1,39 @@
-function estimated_delay_samples = delay_lms(input1, input2)
-    % Estimates the delay between samples using LMS adaptive method
-    
-    step = 0.5; % step size
-    
-    % we want input vectors to be columns
-    input1=input1(:)'';
-    input2=input2(:)'';
-    
-    if(length(input1) ~= length(input2))
+function estimated_delay_samples = delay_lms(input1, input2, max_expected, stepsize)
+    % Estimates the delay between input1 and input2 using LMS adaptive method
+    % using the stepsize provided and max_expected in samples.
+%     clear; clc
+%     init_test_signals()
+%     load 'test_signals.mat';
+%     input1=noise1; input2=noise2;
+%     max_expected = ceil(1.5*real_delay_samples);
+%     stepsize=0.01;
+global h e L;
+    N = length(input1);
+    if(N ~= length(input2))
         disp('Both inputs must be the same length to use LMS TDE');
         return
     end
     
-    % desired length of the input and filter
-    M = min(3,length(input1));
-    n_iterations = floor(length(input1)/M);
+    % assure input vectors to be columns and
+    % normalize max signal amplitudes to +1 and
+    input1 = input1(:)/max(input1);
+    input2 = input2(:)/max(input2);
+    
+    % length of the filter, must be higher than max possible delay
+    L = 2*max_expected;
     %initial state of the filter
-    w = [1 ; zeros(M-1,1)];
+    h = zeros(L,1); h(max_expected)=1;
     
     % iterating for each time instant
-    for n=M:length(input1)
-        x1 = flipud(input1(n-(M-1) : n)); % the n-th M-length input1 vector
-        x2 = flipud(input2(n-(M-1) : n)); % the n-th M-length input2 vector
-        d = w'*x2; % desired to be a mimic of x1 at this instatnt
+    for n=L:N
+        x2 = flipud(input2(n-(L-1) : n)); % the n-th L-length subvector of input2
+        d = h'*x2; % desired to be a mimic of x1 at this instant
         
-        e = x1(M) - d; % error of the mimic at this instant
+        e(n) = input1(n) - d; % error of the mimic at this instant
         
-        w = w - step*e*conj(x2); %update the filter!
+        h = h + 2*stepsize*e(n)*x2; % update the filter!
     end
-        
+    
+    [maximum pos] = max(h);
+    
+    estimated_delay_samples = pos - max_expected;
