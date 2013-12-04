@@ -1,6 +1,7 @@
-function estimated_delay_samples = delay_lms(input1, input2, max_expected, beta)
+function [estimated_delay_samples,h] = delay_lms(input1, input2, max_expected, beta)
     % Estimates the delay between input1 and input2 using LMS adaptive method
     % using the smoothing parameter provided and max_expected in samples.
+    % It also returns the estimate of the filter h that relates both inputs
 
     if exist('DEBUG','var') && DEBUG
         global h e L;  h=0;e=0; L=0;
@@ -22,7 +23,7 @@ function estimated_delay_samples = delay_lms(input1, input2, max_expected, beta)
     input2 = input2(:)/max(input2);
         
     % length of the filter, must be higher than max possible delay
-    L = 2*max_expected;
+    L = floor(2*max_expected);
     %initial state of the filter
     h = zeros(L,1); %h(max_expected+1)=1;
     

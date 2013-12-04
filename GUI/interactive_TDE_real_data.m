@@ -30,7 +30,7 @@ function varargout = interactive_TDE_real_data(varargin)
 
 
 % --- Executes just before interactive_TDE_real_data is made visible.
-function interactive_TDE_real_data_OpeningFcn(hObject, eventdata, handles, varargin)
+function interactive_TDE_real_data_OpeningFcn(hObject, ~, handles, varargin)
     % Choose default command line output for interactive_TDE_real_data
     handles.output = hObject;
 
@@ -39,10 +39,20 @@ function interactive_TDE_real_data_OpeningFcn(hObject, eventdata, handles, varar
 
     % UIWAIT makes interactive_TDE_real_data wait for user response (see UIRESUME)
     % uiwait(handles.figure1);
+    
+    % plot indications for the user
+    set(get(0,'CurrentFigure'),'CurrentAxes',handles.axes_data1)
+    text(0.25,0.5,'Select an hydrophone 1 and plot it')
+    set(get(0,'CurrentFigure'),'CurrentAxes',handles.axes_data2)
+    text(0.25,0.5,'Select an hydrophone 2 and plot it')
+    
+    % reset global variables
+    global data1_FileName data1_PathName data2_FileName data2_PathName Ti_minutes Tf_minutes Tf_seconds Ti_seconds  Ti Tf data1 data2 Fs
+    data1_FileName = ''; data1_PathName = ''; data2_FileName=''; data2_PathName=''; Ti_minutes=0;  Tf_minutes=0; Tf_seconds=0; Ti_seconds=0; Ti=0; Tf=0; data1=0; data2=0; Fs=0;
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = interactive_TDE_real_data_OutputFcn(hObject, eventdata, handles) 
+function varargout = interactive_TDE_real_data_OutputFcn(~, ~, handles) 
     % varargout  cell array for returning output args (see VARARGOUT);
     % hObject    handle to figure
     % eventdata  reserved - to be defined in a future version of MATLAB
@@ -52,10 +62,10 @@ function varargout = interactive_TDE_real_data_OutputFcn(hObject, eventdata, han
     varargout{1} = handles;
 
 
-function select_hydrophone1_Callback(hObject, eventdata, handles)
+function select_hydrophone1_Callback(~, ~, handles)
     % select file and load its name and path
     global data1_FileName data1_PathName;
-    [data1_FileName,data1_PathName,FilterIndex] = uigetfile({'*.wav','Raw samples (*.wav)'},...
+    [data1_FileName,data1_PathName,~] = uigetfile({'*.wav','Raw samples (*.wav)'},...
                                                     'Select the recording of hydrophone 1');
     % warn filename and first parent folder
     for i=length(data1_PathName)-1:-1:1
@@ -65,10 +75,10 @@ function select_hydrophone1_Callback(hObject, eventdata, handles)
     end
     set(handles.selected_file1_text,'String',[data1_PathName(i+1:end),data1_FileName]);
     
-function select_hydrophone2_Callback(hObject, eventdata, handles)
+function select_hydrophone2_Callback(~, ~, handles)
     % select file and load its name and path
     global data2_FileName data2_PathName;
-    [data2_FileName,data2_PathName,FilterIndex] = uigetfile({'*.wav','Raw samples'},...
+    [data2_FileName,data2_PathName,~] = uigetfile({'*.wav','Raw samples'},...
                                                     'Select the recording of hydrophone 2');
     % warn filename and first parent folder
     for i=length(data2_PathName)-1:-1:1
@@ -78,27 +88,24 @@ function select_hydrophone2_Callback(hObject, eventdata, handles)
     end
     set(handles.selected_file2_text,'String',[data2_PathName(i+1:end),data2_FileName]);
     
-    
-        
-
-function Ti_minutes_edit_Callback(hObject, eventdata, handles)
+function Ti_minutes_edit_Callback(hObject, ~, ~)
     global Ti_minutes;
     Ti_minutes = str2double(get(hObject,'String'));
 
-function Tf_minutes_edit_Callback(hObject, eventdata, handles)
+function Tf_minutes_edit_Callback(hObject, ~, ~)
     global Tf_minutes;
     Tf_minutes = str2double(get(hObject,'String'));
 
-function Ti_seconds_edit_Callback(hObject, eventdata, handles)
+function Ti_seconds_edit_Callback(hObject, ~, ~)
     global Ti_seconds;
     Ti_seconds = str2double(get(hObject,'String'));
 
-function Tf_seconds_edit_Callback(hObject, eventdata, handles)
+function Tf_seconds_edit_Callback(hObject, ~, ~)
     global Tf_seconds;
     Tf_seconds = str2double(get(hObject,'String'));
 
 
-function load_data_Callback(hObject, eventdata, handles)
+function load_data_Callback(~, ~, handles)
     % Warn loading
     set(handles.in_progress_text,'String','Loading... hold on a sec.');
 
@@ -113,7 +120,7 @@ function load_data_Callback(hObject, eventdata, handles)
     global data2_FileName data2_PathName;
     global data1 data2 Fs;
     [data1,Fs]=wavread([data1_PathName,data1_FileName]);
-    [data2,Fs]=wavread([data2_PathName,data2_FileName]);
+    [data2,~]=wavread([data2_PathName,data2_FileName]);
     data1 = data1(Ti*Fs :  Tf*Fs);
     data2 = data2(Ti*Fs :  Tf*Fs);
     
@@ -123,7 +130,7 @@ function load_data_Callback(hObject, eventdata, handles)
     
 
     
-function visualize_plot_button_Callback(hObject, eventdata, handles)
+function visualize_plot_button_Callback(~, ~, handles)
     global data1 data2 Fs;
 
     options = cellstr(get(handles.plot_options,'String'));
@@ -144,12 +151,12 @@ function visualize_plot_button_Callback(hObject, eventdata, handles)
             xlabel('Time (Seconds)'); ylabel('Hz');
     end
 
-function tdoa_plot_button_Callback(hObject, eventdata, handles)
+function tdoa_plot_button_Callback(~, ~, handles)
     set(handles.working_go,'String','Working...'); drawnow;
     tdoa(handles,'in_guide');
     set(handles.working_go,'String','Done :)');
 
-function plot_tdoa_separate_window_Callback(hObject, eventdata, handles)
+function plot_tdoa_separate_window_Callback(~, ~, handles)
     set(handles.working_window,'String','Working...'); drawnow;
     tdoa(handles,'separate_window');
     set(handles.working_window,'String','Done :)');
@@ -164,11 +171,15 @@ function tdoa(handles,where)
     end
     if(get(handles.time_gain_option,'Value')==1)
         preprocessing_methods{end+1} = 'time_gain';
+        time_gain_params = struct('alpha',str2num(get(handles.alpha_tg_text,'String')),...
+                                    'r',str2num(get(handles.r_text,'String')));
+    else
+        time_gain_params = [];
     end
     if(get(handles.spectral_substraction_option,'Value')==1)
         preprocessing_methods{end+1} = 'spectral_substraction';
-        spectral_substraction_params = struct('alpha',str2num(get(handles.alpha_text,'String')),...
-                                    'beta',str2num(get(handles.beta_text,'String')));
+        spectral_substraction_params = struct('alpha',str2num(get(handles.alpha_ss_text,'String')),...
+                                    'beta',str2num(get(handles.beta_ss_text,'String')));
     else
         spectral_substraction_params = [];
     end
@@ -181,8 +192,8 @@ function tdoa(handles,where)
     end
     
     % preprocess signals
-    preprocessed_signal1 = clean_signal(data1, preprocessing_methods, percentile_params, spectral_substraction_params);
-    preprocessed_signal2 = clean_signal(data2, preprocessing_methods, percentile_params, spectral_substraction_params);
+    preprocessed_signal1 = clean_signal(data1, preprocessing_methods, percentile_params, spectral_substraction_params, time_gain_params);
+    preprocessed_signal2 = clean_signal(data2, preprocessing_methods, percentile_params, spectral_substraction_params, time_gain_params);
 
     % get selected method in the GUI
     method_options = cellstr(get(handles.tdoa_options,'String'));
@@ -214,6 +225,15 @@ function tdoa(handles,where)
             else
                 plot(handles.axes_tdoa,gcc(preprocessed_signal1, preprocessed_signal2, 'scot'));
             end
+        case 'LMS (Least Mean Squares)'
+            beta = str2num(get(handles.beta_lms_text,'String'));
+            global data1_FileName data2_FileName
+            sensorA = str2double(data1_FileName(end-4));
+            sensorB = str2double(data2_FileName(end-4));
+            addpath 'utils';
+            max_delay = Fs*delay_between_sensors(sensorA, sensorB);
+            [delay_samples h] = delay_lms(preprocessed_signal1, preprocessed_signal2, max_delay, beta);
+            plot(h)
     end
     delay_seconds = delay_samples / Fs;
     set(handles.estimation_samples, 'String', [num2str(delay_samples), ' samples']);
@@ -226,10 +246,24 @@ function tdoa(handles,where)
     delay_error_relative = 100*(delay_error_samples/(true_delay_seconds*Fs));
     set(handles.error_percentatge, 'String', [num2str(delay_error_relative), '%']);
 
-function sound_1_Callback(hObject, eventdata, handles)
+function sound_1_Callback(~, ~, ~)
     global data1 Fs;
     soundsc(data1,Fs);
 
-function sound_2_button_Callback(hObject, eventdata, handles)
+function sound_2_button_Callback(~, ~, ~)
     global data2 Fs;
     soundsc(data2,Fs);
+
+
+function tdoa_options_Callback(hObject, eventdata, handles)
+    % show option for beta (smoothing factor)
+    method_options = cellstr(get(hObject,'String'));
+    method_selected = method_options{get(hObject,'Value')};
+    if(strcmp(method_selected,'LMS (Least Mean Squares)'))
+        set(handles.beta_lms_text,'Visible', 'on')
+        set(handles.text40,'Visible', 'on')
+    else
+        set(handles.beta_lms_text,'Visible', 'off')
+        set(handles.text40,'Visible', 'off')
+    end
+        

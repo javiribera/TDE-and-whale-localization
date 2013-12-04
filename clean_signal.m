@@ -1,7 +1,8 @@
 function output = clean_signal( input,...
                                 preprocessing_methods,...
                                 percentile_params,...
-                                spectrum_substraction_params)
+                                spectrum_substraction_params,...
+                                time_gain_params)
 %CLEAN_SIGNAL Cleans the signal (preconditioning)
 %   It applies the selected preconditioning methods in this folder so detection
 %   will be easier: passband filtering, percentile, spectral substraction
@@ -19,7 +20,7 @@ function output = clean_signal( input,...
     
     for i=1:length(preprocessing_methods)
         if (strcmp(preprocessing_methods{i},'time_gain'))
-            output = time_gain(output);
+            output = time_gain(output, time_gain_params);
         end
     end
     
