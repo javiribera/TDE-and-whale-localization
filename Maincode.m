@@ -1,6 +1,6 @@
 %Load Signal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
-[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
+[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p3.wav');
 
 %Times
 primerevento_inicial=13440000;
@@ -26,6 +26,8 @@ final=primerevento_final;
 Signalcortada=Signal(inicio:final);
 Signal2cortada=Signal2(inicio:final);
 M =length(Signalcortada)
+%%
+output=interactive_TDE_real_data();
 
 
 %% BACKGROUND NOISE
@@ -96,11 +98,17 @@ plot(Signal2cortada)
 
 %% Time Gain normalization
 
-Signalcortada=time_gain(Signalcortada);
-Signal2cortada=time_gain(Signal2cortada);
+Signalprocesada=time_gain(Signalcortada,0.9,1);
+Signal2procesada=time_gain(Signal2cortada,0.9,1);
 
-figure  
-specgram(Signalcortada,1024,Fs,556);
+figure(1)
+plot(Signalprocesada)
+figure(2)
+plot(Signalcortada)
+figure(3) 
+specgram(Signalprocesada,1024,Fs)
+figure(4) 
+specgram(Signalcortada,1024,Fs)
 
 
 
@@ -121,87 +129,19 @@ specgram(Signalcortada,1024,Fs)
 
   
 %%
+%Spectralsubstraction
+Signalprocesada=spectralsubstraction(Signalcortada,Fs,5,0.0001);
+Signal2procesada=spectralsubstraction(Signal2cortada,Fs,5,0.0001);
 
-gamma=2;
+figure(1)
+plot(Signalprocesada)
+figure(2)
+plot(Signalcortada)
+figure(3) 
+specgram(Signalprocesada,1024,Fs)
+figure(4) 
+specgram(Signalcortada,1024,Fs)
 
-Window_length=(Fs*0.075);   %75 ms
-Window_overlap=(Fs*0.0375);    %37.5 ms
-NFFT=2048;
-Noise_Frames=Signalcortada(1:100000);    %The first second of the simulation! It is noise!
-NumOfFrames=floor(length(Signalcortada)/Window_overlap);
-NumOfNoiseFrames=floor(length(Noise_Frames)/Window_overlap);
-Window=hann(Window_length); % A Hann window is chosen
-windowEnergy=sum(Window.^gamma);
-Window=Window.*sqrt(Window_length/windowEnergy); % Normalization of the window 
-
-ProcessedSignal=zeros(length(Signalcortada),1);  
- 
-for k=1:NumOfNoiseFrames-1   %Estimate the NOISE SPECTROGRAM
-    
-   index1=(k-1)*(Window_overlap)+1;
-   index2=(k-1)*(Window_overlap)+Window_length;
-   Frame=Noise_Frames(index1:index2);
-   WindowedFrame=Frame.*Window;
-   FrameFFT=fft(WindowedFrame);
-   FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
-   S(:,k)=FrameSpec;    
-end
-
-F=length(FrameFFT);
-    for i=1:F
-    N(i)=prctile(abs(S(i,:)),90);     %Calculate the percentile vector of the NOISE FRAMES
-   end
-
-    for k=1:NumOfFrames-1     %Calculating the signal spectrogram
-    
-   index1=(k-1)*(Window_overlap)+1;
-   index2=(k-1)*(Window_overlap)+Window_length;
-   Frame=Signalcortada(index1:index2);
-   WindowedFrame=Frame.*Window;
-   FrameFFT=fft(WindowedFrame);
-   FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
-   Sx(:,k)=FrameSpec;    
-   
-    end
-
-    
-  for i=1:(NumOfFrames-1)                        %Substract the Percentile process!
-   index1=(i-1)*(Window_overlap)+1;
-   index2=(i-1)*(Window_overlap)+Window_length;
-    FramePhase=angle(Sx(:,i));  %cCalculate the phase to reconstruct
-   
-      
-         FrameSpec=max(abs(Sx(:,i))-5.*N',0);   %Substract the Percentile
-         
-        
-         
-% Re-synthesize the cleaned speech frame using the phase of the noisy frame   
-   FrameOutputFFT= sqrt(FrameSpec).*cos(FramePhase) +...
-       i.*sqrt(FrameSpec).*sin(FramePhase);
-   FrameOutput=real(ifft(FrameOutputFFT,Window_length)).*sqrt(Window_length);
-   
-   ProcessedSignal(index1:index2)= ProcessedSignal(index1:index2) +...
-       FrameOutput;
-  
-    
-  % Notice the frames are 50% overlapped
-  end
-  output=ProcessedSignal;
-  
-  figure
-   plot(output)
-   figure
-   specgram(output,1024,Fs,556);
-  % spectrogram(output,Window,Window_overlap,NFFT);
-   figure
-   plot(Signalcortada)
-   figure
-   specgram(Signalcortada,1024,Fs,556);
-   %spectrogram(Signalcortada,Window,Window_overlap,NFFT);
-
-   %%
-   
-   sounsc(output,Fs)
 %% Frequency band normalization
 Signalresultant=freq_band(Signalcortada,Fs);
 Signal2resultant=freq_band(Signal2cortada,Fs);
@@ -217,8 +157,8 @@ plot(Signalcortada)
 
 
 %% TK FILTER
-Signalcortadatk=teager_kaiser(Signalcortada);
-Signal2cortadatk=teager_kaiser(Signal2cortada);
+Signalcortada=teager_kaiser(Signalcortada);
+Signal2cortada=teager_kaiser(Signal2cortada);
 
 %PLOT ALL
 %ax(1)=subplot(3,1,1);
@@ -283,80 +223,64 @@ if DEBUG
     plot(gscorr_ballena); title('gcorr Scot between whales');
 end
 
-
 %%
-%NOTHING!! FOR ME (TEMPORAL)
 
-% We run the adaptive filtering algorithm for TDOA estimation within [-600,600]
-% (samples) and step |mu|=0.01 (for full scale signals in [-1,+1]).
+%%AED FUNCTION
 
-% Normalizing max signal amplitudes to +1
-x1=signal_1_tk/max(signal_1_tk);
-x2=signal_2_tk/max(signal_2_tk);
+[peak,peak2]=TDOA_AED(Signalcortada,Signal2cortada,96000*5,0.001);
+time_delay=max(peak)-max(peak2)
 
-% LMS initialization
-M = 600; % max value of the estimated TDOA
-x1c = zeros(M,1);
-x2c = zeros(M,1);
-u = zeros(2*M,1);
-u(M/2) = 1;
-N = length(x1);
-e = zeros(1,N);
-tdoa = zeros(1,N);
-peak = zeros(1,N);
-mu = 0.01; % LMS step
-
-% LMS loop
-for n=1:N
-    
-    x1c = [x1(n);x1c(1:length(x1c)-1)];
-    x2c = [x2(n);x2c(1:length(x2c)-1)];
-    x = [x1c;x2c];
-    
-    e(n) = u'*x;
-    u = u-mu*e(n)*x;
-    u(M/2) = 1; %forcing g2 to an impulse response at M/2
-    u = u/norm(u); %forcing ||u|| to 1
-    
-    [peak(n),ind] = min(u(M+1:end));
-    peak(n)=-peak(n); % find the value of the (positive) impulse
-    TDOA(n) = ind-M/2;
-    
-end
 
 % Estimated TDOA as a function of time, with values of the peak in h1
-subplot(2,1,1);
-plot(TDOA);
-xlabel('Time (samples)'); ylabel('TDOA (samples)');
-subplot(2,1,2);
+
+figure
 plot(peak);
 xlabel('Time (samples)'); ylabel('peak');
 
-%% TDE Eigenvalue Descomposition
-Signal_a_correlar=Signalcortada;
-Signal_a_correlar2=Signal2cortada;
+%%
+TDE=prueba(Signalprocesada,Signal2procesada,0.01)
 
-R=toeplitz(Signal_a_correlar,Signal_a_correlar2);
-[eigenvec,lambda]=eig(R);   %sacar eigenvectors y eigenvalues
-if (length(R)==length(eigenvec))   %mirar que tengan el mismo rango (R y eigenvec)
-    
-    
-   %caso no ruido
-   %Buscar el eigenvalue 0. Entonces coger el
-    %vector de ese eigenvalue sera el chanel response u=(h1,-h0) de la señal
-    %Rx0x1. 
-    %Despues, miramos que h1 y h0 no contengan ningun 0 en comun
-    %finalmente, T=argmax h1,l - argmax h0,l   con valores abs
-    
-    %caso ruido
-    %u(k+1)=   (u(k)-mu*error*x)/(norma(u-mu*error*x))  con norma(u)2=1 con
-    %error=u*x     PROBLEMA DE INICIALIZAR!!! LEER MAÑANA    
-    
-    
+
+
+
+
+%% TDE Eigenvalue Descomposition
+x1=Signalprocesada;
+x2=Signal2procesada;
+mu=10000;
+x1 =x1(:);
+x2 =x2(:);
+N = length(x1);
+% LMS initialization
+x1=x1(1:N);
+x2=x2(1:N);
+g1=zeros(N,1);
+g2=zeros(N,1);
+
+T=floor(N/2);
+g2(T)=1;
+g1(T)=1;
+L=2*N;
+u=[g2;-g1];
+
+x=[x1;x2];
+
+x1=x1/max(x1);
+x2=x2/max(x2);
+
+% LMS loop
+ % preallocated, for speed
+for n=1:500
+    e=dot(x1,u(1:N))-dot(x2,u(N+1:L));
+    u = u-mu*e*x;
+    u = u/norm(u); %forcing ||u|| to 1
 end
 
-    
-   
+[H1max,ind1]=max(abs(u(1:N)));
+[H2min,ind2]=min((u(1:2*N)));
+ind1
+ind2
+TDE=(ind2-ind1)
     
     
 
