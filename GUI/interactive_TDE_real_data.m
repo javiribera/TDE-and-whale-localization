@@ -63,7 +63,7 @@ function varargout = interactive_TDE_real_data_OutputFcn(~, ~, handles)
     varargout{1} = handles;
 
 
-function select_hydrophone1_Callback(~, ~, handles)
+function select_hydrophone1_Callback(hObject, ~, handles)
     % select file and load its name and path
     global data1_FileName data1_PathName;
     [data1_FileName,data1_PathName,~] = uigetfile({'*.wav','Raw samples (*.wav)'},...
@@ -302,10 +302,10 @@ function true_delay_seconds_text_Callback(hObject, ~, handles)
     % show samples for the chosen true delay in seconds
     seconds = str2num(get(hObject, 'String'));
     samples = floor(seconds*Fs);
-    set(handles.true_delay_samples,'String', num2str(samples));
+    set(handles.true_delay_samples_text,'String', num2str(samples));
 
 
-function true_delay_samples_Callback(hObject, ~, handles)
+function true_delay_samples_text_Callback(hObject, ~, handles)
     % show seconds for the chosen true delay in samples
     global Fs;
     samples = str2num(get(hObject, 'String'));
