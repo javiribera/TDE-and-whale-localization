@@ -73,7 +73,7 @@ pwelch(real_noise,[],[],[],Fs);
         Fs = 96000;  % Sampling Frequency
         N      = 50;     % Order
         Fpass1 = 1e3;   % First Passband Frequency
-        Fpass2 = 12e3;  % Second Passband Frequency
+        Fpass2 = 3e3;  % Second Passband Frequency
         Apass  = 1;      % Passband Ripple (dB)
         % Construct an FDESIGN object and call its CHEBY1 method.
         h  = fdesign.bandpass('N,Fp1,Fp2,Ap', N, Fpass1, Fpass2, Apass, Fs);
@@ -101,14 +101,14 @@ plot(Signal2cortada)
 Signalprocesada=time_gain(Signalcortada,0.9,1);
 Signal2procesada=time_gain(Signal2cortada,0.9,1);
 
-figure(1)
-plot(Signalprocesada)
-figure(2)
-plot(Signalcortada)
-figure(3) 
-specgram(Signalprocesada,1024,Fs)
-figure(4) 
-specgram(Signalcortada,1024,Fs)
+%figure(1)
+%plot(Signalprocesada)
+%figure(2)
+%plot(Signalcortada)
+%figure(3) 
+%specgram(Signalprocesada,1024,Fs)
+%figure(4) 
+%specgram(Signalcortada,1024,Fs)
 
 
 
@@ -133,14 +133,14 @@ specgram(Signalcortada,1024,Fs)
 Signalprocesada=spectralsubstraction(Signalcortada,Fs,5,0.0001);
 Signal2procesada=spectralsubstraction(Signal2cortada,Fs,5,0.0001);
 
-figure(1)
-plot(Signalprocesada)
-figure(2)
-plot(Signalcortada)
-figure(3) 
-specgram(Signalprocesada,1024,Fs)
-figure(4) 
-specgram(Signalcortada,1024,Fs)
+%figure(1)
+%plot(Signalprocesada)
+%figure(2)
+%plot(Signalcortada)
+%figure(3) 
+%specgram(Signalprocesada,1024,Fs)
+%figure(4) 
+%specgram(Signalcortada,1024,Fs)
 
 %% Frequency band normalization
 Signalresultant=freq_band(Signalcortada,Fs);
@@ -224,104 +224,85 @@ if DEBUG
 end
 
 %%
+N=length(Signalprocesada);
+Signalprocesada=Signalprocesada(96000*5:N);
+Signal2procesada=Signal2procesada(96000*5:N);
 
-%%AED FUNCTION
+Signalprocesada=downsample(Signalprocesada,10);
+Signal2procesada=downsample(Signal2procesada,10);
+delaymax=9600*10;
 
-[peak,peak2]=TDOA_AED(Signalcortada,Signal2cortada,96000*5,0.001);
-time_delay=max(peak)-max(peak2)
-
-
-% Estimated TDOA as a function of time, with values of the peak in h1
-
-figure
+[TDE,peak]=pruebadelay2(Signalprocesada,Signal2procesada,delaymax,1);
+[val,ind]=max(peak);
+Best_estimate_TDOA=TDE(ind)
+subplot(2,1,1);
+plot(TDE);
+xlabel('Time (samples)'); ylabel('TDOA (samples)');
+subplot(2,1,2);
 plot(peak);
 xlabel('Time (samples)'); ylabel('peak');
-
 %%
 
+%%INTERNET ALGORITHM
 
-delaymax=96000*5;
-T=96000*10;
-Signalprocesada=Signalprocesada(T-delaymax:T+delaymax);
-Signal2procesada=Signal2procesada(T-delaymax:T+delaymax);
-TDE=pruebadelay(Signalprocesada,Signal2procesada,500,2000)
+Signalprocesada=downsample(Signalprocesada,3);
+Signal2procesada=downsample(Signal2procesada,3);
+delaymax=32000*5;
+[phi,delay]=doa_aevd2(Signalprocesada,Signal2procesada,7500,delaymax,delaymax*6,10,32000);
+[val,ind]=max(delay);
+ind
+Best_estimate_TDOA=delay(ind)
+subplot(2,1,1);
+plot(delay);
+xlabel('Time (samples)'); ylabel('TDOA (samples)');
+subplot(2,1,2);
+
 
 
 %%
 
 max_delay=96000*5;
-N=length(Signalprocesada);
 delaymax=96000*5;
 T=96000*10;
 Signalprocesada=Signalprocesada(T-delaymax:T+delaymax);
 Signal2procesada=Signal2procesada(T-delaymax:T+delaymax);
 x1=Signalprocesada/max(Signalprocesada);
 x2=Signal2procesada/max(Signal2procesada);
-iteration=1000;
-mu=500;
+iteration=4000;
+mu=1000;
+x1=x1/max(x1);
+x2=x2/max(x2);
+
 x1 = x1(:);
 x2 = x2(:);
 Nx = length(x1);
 
-% set M to a multiple of filter lenght N (required by block processing)
- % length of the filter, must be higher than max possible delay
- Q=floor(2*Nx);
+
+ 
     %initial state of the filter
-    u = zeros(Q,1); 
+    u = zeros(2*Nx,1); 
     M=floor(Nx/2);
     u(M+1)=1;
+    u(Nx+M+1)=-1;
   x=[x1;x2];
    for m=1:iteration
       
-       e=dot(x,u);
+       e=dot(x,u);  %scalar product
        
     u = u-mu*e*x;
+    u=u/(norm(u));
        
     end
     
-    [maximum,pos] = max(u);
+    [maximum,pos] = max(u(1:Nx));
+    [maximum2,pos2] = min(u);
+    delay = pos2-pos
+    figure
+    plot(u)
     
-    delay = pos-1
+    %%
+    %%Localization
     
-    
-   
-%% TDE Eigenvalue Descomposition
-x1=Signalprocesada;
-x2=Signal2procesada;
-mu=10000;
-x1 =x1(:);
-x2 =x2(:);
-N = length(x1);
-% LMS initialization
-x1=x1(1:N);
-x2=x2(1:N);
-g1=zeros(N,1);
-g2=zeros(N,1);
-
-T=floor(N/2);
-g2(T)=1;
-g1(T)=1;
-L=2*N;
-u=[g2;-g1];
-
-x=[x1;x2];
-
-x1=x1/max(x1);
-x2=x2/max(x2);
-
-% LMS loop
- % preallocated, for speed
-for n=1:500
-    e=dot(x1,u(1:N))-dot(x2,u(N+1:L));
-    u = u-mu*e*x;
-    u = u/norm(u); %forcing ||u|| to 1
-end
-
-[H1max,ind1]=max(abs(u(1:N)));
-[H2min,ind2]=min((u(1:2*N)));
-ind1
-ind2
-TDE=(ind2-ind1)
     
     
 
