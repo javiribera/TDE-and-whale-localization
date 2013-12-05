@@ -107,7 +107,7 @@ function Tf_seconds_edit_Callback(hObject, ~, ~)
 
 function load_data_Callback(~, ~, handles)
     % Warn loading
-    set(handles.in_progress_text,'String','Loading... hold on a sec.');
+    set(handles.in_progress_text,'String','Loading... hold on a sec.'); drawnow
 
     % Compute the time periods
     global Ti_minutes Tf_minutes Ti_seconds Tf_seconds;
@@ -123,6 +123,12 @@ function load_data_Callback(~, ~, handles)
     [data2,~]=wavread([data2_PathName,data2_FileName]);
     data1 = data1(Ti*Fs :  Tf*Fs);
     data2 = data2(Ti*Fs :  Tf*Fs);
+    
+    % create players
+    global data1_player data2_player;
+    addpath 'utils'
+    data1_player = audioplayer(scale_signal(data1,-1,1),Fs)
+    data2_player = audioplayer(scale_signal(data2,-1,1),Fs)
     
     % Warn loaded
     set(handles.in_progress_text,'String','Loaded :)');
@@ -246,13 +252,21 @@ function tdoa(handles,where)
     delay_error_relative = 100*(delay_error_samples/(true_delay_seconds*Fs));
     set(handles.error_percentatge, 'String', [num2str(delay_error_relative), '%']);
 
-function sound_1_Callback(~, ~, ~)
-    global data1 Fs;
-    soundsc(data1,Fs);
+function play_sound_1_Callback(~, ~, ~)
+    global data1_player;
+    play(data1_player)
 
-function sound_2_button_Callback(~, ~, ~)
-    global data2 Fs;
-    soundsc(data2,Fs);
+function play_sound_2_button_Callback(~, ~, ~)
+    global data2_player;
+    play(data2_player)
+
+function stop_sound_1_Callback(hObject, eventdata, handles)
+    global data1_player;
+    stop(data1_player)
+
+function stop_sound_2_Callback(hObject, eventdata, handles)
+    global data2_player;
+    stop(data2_player)
 
 
 function tdoa_options_Callback(hObject, eventdata, handles)
