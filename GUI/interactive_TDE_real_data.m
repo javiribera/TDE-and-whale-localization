@@ -267,3 +267,6 @@ function tdoa_options_Callback(hObject, eventdata, handles)
         set(handles.text40,'Visible', 'off')
     end
         
+function plot_3D_sensors_Callback(~, ~, ~)
+    addpath 'utils'
+    plot3Dsensors
