@@ -1,6 +1,6 @@
 %Load Signal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
-[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
+[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p5.wav');
 
 %Times
 primerevento_inicial=13440000;
@@ -133,14 +133,14 @@ specgram(Signalcortada,1024,Fs)
 Signalprocesada=spectralsubstraction(Signalcortada,Fs,5,0.0001);
 Signal2procesada=spectralsubstraction(Signal2cortada,Fs,5,0.0001);
 
-figure(1)
-plot(Signalprocesada)
-figure(2)
-plot(Signalcortada)
-figure(3) 
-specgram(Signalprocesada,1024,Fs)
-figure(4) 
-specgram(Signalcortada,1024,Fs)
+%figure(1)
+%plot(Signalprocesada)
+%figure(2)
+%plot(Signalcortada)
+%figure(3) 
+%specgram(Signalprocesada,1024,Fs)
+%figure(4) 
+%specgram(Signalcortada,1024,Fs)
 
 %% Frequency band normalization
 Signalresultant=freq_band(Signalcortada,Fs);
@@ -224,13 +224,17 @@ if DEBUG
 end
 
 %%
+N=length(Signalprocesada);
+Signalprocesada=Signalprocesada(1:N-96000*5);
+Signal2procesada=Signal2procesada(1:N-96000*5);
 
 Signalprocesada=downsample(Signalprocesada,15);
 Signal2procesada=downsample(Signal2procesada,15);
 delaymax=6400*5;
-[TDE,peak]=pruebadelay2(Signalprocesada,Signal2procesada,delaymax,1);
+
+[TDE,peak]=pruebadelay2(Signalprocesada,Signal2procesada,delaymax,0.0001);
 [val,ind]=max(peak);
-Best_estimate_TDOA=TDE(ind)
+Best_estimate_TDOA=TDE(ind);
 subplot(2,1,1);
 plot(TDE);
 xlabel('Time (samples)'); ylabel('TDOA (samples)');
@@ -238,22 +242,28 @@ subplot(2,1,2);
 plot(peak);
 xlabel('Time (samples)'); ylabel('peak');
 %%
+subplot(2,2,1)
+specgram(Signalprocesada)
+[k,ind2]=max(TDE);
+time_delay=ind2-k;
+time_delay=time_delay*15/96000
+%%
+
 
 %%INTERNET ALGORITHM
 
-Signalprocesada=downsample(Signalprocesada,15);
-Signal2procesada=downsample(Signal2procesada,15);
-delaymax=6400*5;
-[phi,delay]=doa_aevd2(Signalprocesada,Signal2procesada,7500,delaymax,delaymax*6,10,6400);
+Signalprocesada=downsample(Signalprocesada,3);
+Signal2procesada=downsample(Signal2procesada,3);
+delaymax=32000*5;
+[phi,delay]=doa_aevd2(Signalprocesada,Signal2procesada,7500,delaymax,delaymax*6,10,32000);
 [val,ind]=max(delay);
 ind
 Best_estimate_TDOA=delay(ind)
 subplot(2,1,1);
-plot(TDE);
+plot(delay);
 xlabel('Time (samples)'); ylabel('TDOA (samples)');
 subplot(2,1,2);
-plot(peak);
-xlabel('Time (samples)'); ylabel('peak');
+
 
 
 %%

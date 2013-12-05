@@ -1,4 +1,4 @@
-function delay = delay_aed(x1,x2,mu)
+function delay = delay_aed(x1,x2,mu,max_delay)
 %function phi = doa_aevd2(x1,x2,dx,N,M,mu,Fs)
 %
 % direction estimation (azimuth phi) for 1 dim. microphone arrays
@@ -39,13 +39,20 @@ function delay = delay_aed(x1,x2,mu)
 
 
 
-
+x1=x1/max(x1);
+x2=x2/max(x2);
 
 x1 = x1(:);
 x2 = x2(:);
 Nx = min(length(x1),length(x2));
 
 % set M to a multiple of filter lenght N (required by block processing)
+ % length of the filter, must be higher than max possible delay
+    L = 2*max_expected;
+    %initial state of the filter
+    h1 = zeros(2*L,1); 
+    h1(L+1)=1;
+   
 
 N=96000*25;
 Nf = 2*N;                 % FFT length   
