@@ -88,32 +88,20 @@ function select_hydrophone2_Callback(~, ~, handles)
     end
     set(handles.selected_file2_text,'String',[data2_PathName(i+1:end),data2_FileName]);
     
-function Ti_minutes_edit_Callback(hObject, ~, ~)
-    global Ti_minutes;
-    Ti_minutes = str2double(get(hObject,'String'));
-
-function Tf_minutes_edit_Callback(hObject, ~, ~)
-    global Tf_minutes;
-    Tf_minutes = str2double(get(hObject,'String'));
-
-function Ti_seconds_edit_Callback(hObject, ~, ~)
-    global Ti_seconds;
-    Ti_seconds = str2double(get(hObject,'String'));
-
-function Tf_seconds_edit_Callback(hObject, ~, ~)
-    global Tf_seconds;
-    Tf_seconds = str2double(get(hObject,'String'));
-
 
 function load_data_Callback(~, ~, handles)
     % Warn loading
     set(handles.in_progress_text,'String','Loading... hold on a sec.'); drawnow
 
     % Compute the time periods
-    global Ti_minutes Tf_minutes Ti_seconds Tf_seconds;
-    global Ti Tf;
-    Ti = Ti_minutes*60 + Ti_seconds;
-    Tf = Tf_minutes*60 + Tf_seconds;
+    if(~get(handles.all_signal_select,'Value'))
+        Ti_minutes = str2double(get(handles.Ti_minutes_edit,'String'));
+        Tf_minutes = str2double(get(handles.Tf_minutes_edit,'String'));
+        Ti_seconds = str2double(get(handles.Ti_seconds_edit,'String'));
+        Tf_seconds = str2double(get(handles.Tf_seconds_edit,'String'));    
+        Ti = Ti_minutes*60 + Ti_seconds;
+        Tf = Tf_minutes*60 + Tf_seconds;
+    end
     
     % Load the data
     global data1_FileName data1_PathName;
@@ -121,20 +109,20 @@ function load_data_Callback(~, ~, handles)
     global data1 data2 Fs;
     [data1,Fs]=wavread([data1_PathName,data1_FileName]);
     [data2,~]=wavread([data2_PathName,data2_FileName]);
-    data1 = data1(Ti*Fs :  Tf*Fs);
-    data2 = data2(Ti*Fs :  Tf*Fs);
+    if(~get(handles.all_signal_select,'Value'))
+        data1 = data1(Ti*Fs :  Tf*Fs);
+        data2 = data2(Ti*Fs :  Tf*Fs);
+    end
     
     % create players
     global data1_player data2_player;
     addpath 'utils'
-    data1_player = audioplayer(scale_signal(data1,-1,1),Fs)
-    data2_player = audioplayer(scale_signal(data2,-1,1),Fs)
+    data1_player = audioplayer(scale_signal(data1,-1,1),Fs);
+    data2_player = audioplayer(scale_signal(data2,-1,1),Fs);
     
     % Warn loaded
     set(handles.in_progress_text,'String','Loaded :)');
     set(handles.sampling_frequency_text,'String',[num2str(Fs/1000), ' KHz']);
-    
-
     
 function visualize_plot_button_Callback(~, ~, handles)
     global data1 data2 Fs;
@@ -284,3 +272,19 @@ function tdoa_options_Callback(hObject, eventdata, handles)
 function plot_3D_sensors_Callback(~, ~, ~)
     addpath 'utils'
     plot3Dsensors
+
+
+% --- Executes on button press in all_signal_select.
+function all_signal_select_Callback(hObject, eventdata, handles)
+    % deactivate all Time inputs
+    if(get(hObject,'Value'))
+        set(handles.Ti_minutes_edit,'Enable', 'off')
+        set(handles.Tf_minutes_edit,'Enable', 'off')
+        set(handles.Ti_seconds_edit,'Enable', 'off')
+        set(handles.Tf_seconds_edit,'Enable', 'off')
+    else
+        set(handles.Ti_minutes_edit,'Enable', 'on')
+        set(handles.Tf_minutes_edit,'Enable', 'on')
+        set(handles.Ti_seconds_edit,'Enable', 'on')
+        set(handles.Tf_seconds_edit,'Enable', 'on')
+    end

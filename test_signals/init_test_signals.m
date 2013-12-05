@@ -65,6 +65,12 @@ end
 %% Store signals
 real_delay_samples = delay_samples;
 save('test_signals/test_signals', 'seno1','seno2','chirp1','chirp2','noise1', 'noise2', 'real_delay_samples','fs');
+wavwrite(seno1, fs, 'test_signals/seno1.wav')
+wavwrite(seno2, fs, 'test_signals/seno2.wav')
+wavwrite(noise1, fs, 'test_signals/noise1.wav')
+wavwrite(noise2, fs, 'test_signals/noise2.wav')
+wavwrite(chirp1, fs, 'test_signals/chirp1.wav')
+wavwrite(chirp2, fs, 'test_signals/chirp2.wav')
 
 if ~DEBUG
     clear;
