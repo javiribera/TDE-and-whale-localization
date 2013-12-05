@@ -47,8 +47,9 @@ function interactive_TDE_real_data_OpeningFcn(hObject, ~, handles, varargin)
     text(0.25,0.5,'Select an hydrophone 2 and plot it')
     
     % reset global variables
-    global data1_FileName data1_PathName data2_FileName data2_PathName Ti_minutes Tf_minutes Tf_seconds Ti_seconds  Ti Tf data1 data2 Fs
-    data1_FileName = ''; data1_PathName = ''; data2_FileName=''; data2_PathName=''; Ti_minutes=0;  Tf_minutes=0; Tf_seconds=0; Ti_seconds=0; Ti=0; Tf=0; data1=0; data2=0; Fs=0;
+%     global data1_FileName data1_PathName data2_FileName data2_PathName Ti_minutes Tf_minutes Tf_seconds Ti_seconds  Ti Tf data1 data2 Fs
+%     data1_FileName = ''; data1_PathName = ''; data2_FileName=''; data2_PathName=''; Ti_minutes=0;  Tf_minutes=0; Tf_seconds=0; Ti_seconds=0; Ti=0; Tf=0; data1=0; data2=0; Fs=0;
+    clear all; clc;
 
 
 % --- Outputs from this function are returned to the command line.
@@ -232,12 +233,14 @@ function tdoa(handles,where)
     delay_seconds = delay_samples / Fs;
     set(handles.estimation_samples, 'String', [num2str(delay_samples), ' samples']);
     set(handles.estimation_seconds, 'String', [num2str(delay_seconds), ' seconds']);
-    true_delay_seconds = str2num(get(handles.true_delay_text, 'String'));
+    
+    true_delay_samples = str2num(get(handles.true_delay_samples_text, 'String'));
+    true_delay_seconds = true_delay_samples/Fs;
     delay_error_seconds = delay_seconds - true_delay_seconds;
-    delay_error_samples = delay_samples - true_delay_seconds*Fs;
+    delay_error_samples = delay_samples - true_delay_samples;
     set(handles.error_seconds, 'String', [num2str(delay_error_seconds), ' seconds']);
     set(handles.error_samples, 'String', [num2str(delay_error_samples), ' samples']);
-    delay_error_relative = 100*(delay_error_samples/(true_delay_seconds*Fs));
+    delay_error_relative = 100*(delay_error_samples/delay_error_samples);
     set(handles.error_percentatge, 'String', [num2str(delay_error_relative), '%']);
 
 function play_sound_1_Callback(~, ~, ~)
@@ -273,9 +276,7 @@ function plot_3D_sensors_Callback(~, ~, ~)
     addpath 'utils'
     plot3Dsensors
 
-
-% --- Executes on button press in all_signal_select.
-function all_signal_select_Callback(hObject, eventdata, handles)
+function all_signal_select_Callback(~, ~, handles)
     % deactivate all Time inputs
     if(get(hObject,'Value'))
         set(handles.Ti_minutes_edit,'Enable', 'off')
@@ -288,3 +289,25 @@ function all_signal_select_Callback(hObject, eventdata, handles)
         set(handles.Ti_seconds_edit,'Enable', 'on')
         set(handles.Tf_seconds_edit,'Enable', 'on')
     end
+
+
+
+function true_delay_seconds_text_Callback(hObject, ~, handles)
+    global Fs;
+    if isempty(Fs)
+        msgbox('Whats the frequency sample (Fs)? Seconds by themselves have no sense. Import first some data',...
+            'You forgot Fs','warn')
+        return
+    end
+    % show samples for the chosen true delay in seconds
+    seconds = str2num(get(hObject, 'String'));
+    samples = floor(seconds*Fs);
+    set(handles.true_delay_samples,'String', num2str(samples));
+
+
+function true_delay_samples_Callback(hObject, ~, handles)
+    % show seconds for the chosen true delay in samples
+    global Fs;
+    samples = str2num(get(hObject, 'String'));
+    seconds = samples/Fs;
+    set(handles.true_delay_seconds_text,'String', num2str(seconds));
