@@ -1,6 +1,7 @@
-
-load 'test_signals.mat';
-DEBUG=1;
+addpath 'test_signals'
+init_test_signals()
+load 'test_signals/test_signals.mat';
+DEBUG=1
 
 
 figure

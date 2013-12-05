@@ -1,6 +1,7 @@
+addpath 'test_signals'
 init_test_signals()
-load 'test_signals.mat';
-DEBUG=1;
+load 'test_signals/test_signals.mat';
+DEBUG=1
 
 gcc_mode = 'scot';
 

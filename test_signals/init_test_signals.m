@@ -6,10 +6,10 @@ DEBUG=0;
 %% Init parameters of the signals
 
 fs = 96e3; % sampling rate, the same as in the sensors, 96 KHz
-nsamples = 2^20; % length of the sequence
+nsamples = 2^14; % length of the sequence
 
 
-delay_seconds = 3;  % possible real delay, -> but larger than sinus period,
+delay_seconds = 0.001;  % possible real delay, -> but larger than sinus period,
                     % so delay on sinus is periodic
 delay_samples = floor(delay_seconds*fs);
 
@@ -64,7 +64,7 @@ end
 
 %% Store signals
 real_delay_samples = delay_samples;
-save('test_signals', 'seno1','seno2','chirp1','chirp2','noise1', 'noise2', 'real_delay_samples','fs');
+save('test_signals/test_signals', 'seno1','seno2','chirp1','chirp2','noise1', 'noise2', 'real_delay_samples','fs');
 
 if ~DEBUG
     clear;

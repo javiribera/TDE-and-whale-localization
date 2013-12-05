@@ -1,5 +1,6 @@
+addpath 'test_signals'
 init_test_signals()
-load 'test_signals.mat';
+load 'test_signals/test_signals.mat';
 DEBUG=1;
 
 %% TDE on sinus using xcorr and the maximum peak
