@@ -276,7 +276,7 @@ function plot_3D_sensors_Callback(~, ~, ~)
     addpath 'utils'
     plot3Dsensors
 
-function all_signal_select_Callback(~, ~, handles)
+function all_signal_select_Callback(hObject, ~, handles)
     % deactivate all Time inputs
     if(get(hObject,'Value'))
         set(handles.Ti_minutes_edit,'Enable', 'off')
