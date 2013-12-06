@@ -117,9 +117,8 @@ for n = 1:N:Nx-Nf
 end
 
 delay = delay(1:k);
-disp(sprintf('final delay = %2.4e msec (%d samples)', ...
-             1000*delay(end)/Fs1, delay(end)));
+
 phi = 180/pi*real(acos(vs/dx*delay/Fs1));
-disp(sprintf('final azimuth = %2.4e deg', phi(end)));
+
 
 
