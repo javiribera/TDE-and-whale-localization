@@ -127,6 +127,11 @@ function load_data_Callback(~, ~, handles)
     
 function visualize_plot_button_Callback(~, ~, handles)
     global data1 data2 Fs;
+    
+    % warn user starting
+    set(handles.plotting, 'String', 'Plotting...')
+    set(handles.plotting, 'Visible', 'on')
+    drawnow
 
     options = cellstr(get(handles.plot_options,'String'));
     selected = options{get(handles.plot_options,'Value')};
@@ -136,15 +141,20 @@ function visualize_plot_button_Callback(~, ~, handles)
             plot(handles.axes_data2,data2);
         case 'Spectrogram'
             [S,F,T,P] = spectrogram(data1,256,250,256,Fs);
-            surf(handles.axes_data1,T,F,10*log10(P),'edgecolor','none'); axis tight; 
+            surf(handles.axes_data1,T,F/1000,10*log10(P),'edgecolor','none'); 
             view(handles.axes_data1,0,90);
-            xlabel('Time (Seconds)'); ylabel('Hz');
-            
+            ylabel('KHz'); axis tight
+            drawnow
+                        
             [S,F,T,P] = spectrogram(data2,256,250,256,Fs);
-            surf(handles.axes_data2,T,F,10*log10(P),'edgecolor','none'); axis tight; 
+            surf(handles.axes_data2,T,F/1000,10*log10(P),'edgecolor','none');
             view(handles.axes_data2,0,90);
-            xlabel('Time (Seconds)'); ylabel('Hz');
+            ylabel('KHz'); axis tight
+            drawnow
     end
+    
+    % warn user end
+    set(handles.plotting, 'String', 'Plotted')
 
 function tdoa_plot_button_Callback(~, ~, handles)
     set(handles.working_go,'String','Working...'); drawnow;
@@ -161,6 +171,9 @@ function tdoa(handles,where)
     
     % get preprocessing methods selected in the GUI
     preprocessing_methods = {};
+    if(get(handles.remove_mean_option,'Value')==1)
+        preprocessing_methods{end+1} = 'remove_mean';
+    end
     if(get(handles.band_pass_option,'Value')==1)
         preprocessing_methods{end+1} = 'band_pass';
     end
@@ -240,7 +253,7 @@ function tdoa(handles,where)
     delay_error_samples = delay_samples - true_delay_samples;
     set(handles.error_seconds, 'String', [num2str(delay_error_seconds), ' seconds']);
     set(handles.error_samples, 'String', [num2str(delay_error_samples), ' samples']);
-    delay_error_relative = 100*(delay_error_samples/delay_error_samples);
+    delay_error_relative = 100*(delay_error_samples/true_delay_samples);
     set(handles.error_percentatge, 'String', [num2str(delay_error_relative), '%']);
 
 function play_sound_1_Callback(~, ~, ~)

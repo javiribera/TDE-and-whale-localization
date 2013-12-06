@@ -3,7 +3,7 @@ function [estimated_delay_samples,h] = delay_lms(input1, input2, max_expected, b
     % using the smoothing parameter provided and max_expected in samples.
     % It also returns the estimate of the filter h that relates both inputs
 
-    if exist('DEBUG','var') && DEBUG
+    if ~isempty(DEBUG) && DEBUG
         global h e L;  h=0;e=0; L=0;
     end
     
@@ -31,7 +31,7 @@ function [estimated_delay_samples,h] = delay_lms(input1, input2, max_expected, b
     est_power = mean(input2(1:L).^2); %initially
     for n=L:N
         % show progress
-        if exist('DEBUG','var') && DEBUG
+        if ~isempty(DEBUG) && DEBUG
             disp(['step ', num2str(n) ,' of', num2str(N)])
         end
         

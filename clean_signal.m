@@ -10,7 +10,13 @@ function output = clean_signal( input,...
 
     addpath('preconditioning')
     
-    output = input - mean(input);
+    output = input;
+    
+    for i=1:length(preprocessing_methods)
+        if (strcmp(preprocessing_methods{i},'remove_mean'))
+            output = output - mean(output);
+        end
+    end
     
     for i=1:length(preprocessing_methods)
         if (strcmp(preprocessing_methods{i},'band_pass'))
