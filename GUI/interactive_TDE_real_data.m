@@ -213,35 +213,54 @@ function tdoa(handles,where)
     % compute tdoa by selection
     switch method_selected
         case 'Cross-correlation (xcorr)'
+            % warn label
+            set(handles.plot_label, 'String', 'GCC Scot result')
+            set(handles.plot_label, 'Visible', 'on')
+            
             delay_samples = delay_xcorr(preprocessed_signal1,preprocessed_signal2);
+            
             if(strcmp(where,'separate_window'))
                 plot(xcorr(preprocessed_signal1,preprocessed_signal2));
             else
                 plot(handles.axes_tdoa,xcorr(preprocessed_signal1,preprocessed_signal2));
             end
+            
         case 'GCC Phat (Generalized cross-correlation, phase transform)'
+            % warn label
+            set(handles.plot_label, 'String', 'GCC Phat result')
+            set(handles.plot_label, 'Visible', 'on')
+            
             delay_samples = delay_gcc(preprocessed_signal1,preprocessed_signal2,'phat');
+            
             if(strcmp(where,'separate_window'))
                 plot(gcc(preprocessed_signal1, preprocessed_signal2, 'phat'));
             else
                 plot(handles.axes_tdoa,gcc(preprocessed_signal1, preprocessed_signal2, 'phat'));
             end
+            
         case 'GCC Scot (Generalized cross-correlation, smoothed coherence transform)'
+            % warn label
+            set(handles.plot_label, 'String', 'GCC Scot result')
+            set(handles.plot_label, 'Visible', 'on')
+            
             delay_samples = delay_gcc(preprocessed_signal1,preprocessed_signal2,'scot');
+            
             if(strcmp(where,'separate_window'))
                 plot(gcc(preprocessed_signal1, preprocessed_signal2, 'scot'));
             else
                 plot(handles.axes_tdoa,gcc(preprocessed_signal1, preprocessed_signal2, 'scot'));
             end
+            
         case 'LMS (Least Mean Squares)'
+            % warn label
+            set(handles.plot_label, 'String', 'Estimated Filter Impulse response')
+            set(handles.plot_label, 'Visible', 'on')
+            
             beta = str2num(get(handles.beta_lms_text,'String'));
-            global data1_FileName data2_FileName
-            sensorA = str2double(data1_FileName(end-4));
-            sensorB = str2double(data2_FileName(end-4));
-            addpath 'utils';
-            max_delay = Fs*delay_between_sensors(sensorA, sensorB);
-            [delay_samples h] = delay_lms(preprocessed_signal1, preprocessed_signal2, max_delay, beta);
-            plot(h)
+            max_delay = str2num(get(handles.true_delay_samples_text, 'String'));
+            plot(handles.axes_tdoa,0)
+            [delay_samples,h,e] = delay_lms(preprocessed_signal1, preprocessed_signal2, max_delay, beta, handles);
+            plot(handles.axes_tdoa, h)
     end
     delay_seconds = delay_samples / Fs;
     set(handles.estimation_samples, 'String', [num2str(delay_samples), ' samples']);
@@ -324,3 +343,14 @@ function true_delay_samples_text_Callback(hObject, ~, handles)
     samples = str2num(get(hObject, 'String'));
     seconds = samples/Fs;
     set(handles.true_delay_seconds_text,'String', num2str(seconds));
+
+function toogle_debug_Callback(hObject, ~, ~)
+    global DEBUG;
+    if DEBUG
+        DEBUG = 0;
+        set(hObject,'Label', 'Enable DEBUG')
+    else
+        DEBUG = 1;
+        set(hObject,'Label', 'Disable DEBUG')
+    end
+        
