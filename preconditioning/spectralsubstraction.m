@@ -1,6 +1,10 @@
 function output = spectralsubstraction(input,signal_substraction_params)
 
   %% SPECTRAL SUBSTRACTION
+  
+    % assure input vectors to be columns
+    input = input(:);
+    
   global Fs;
   alpha = signal_substraction_params.alpha;
   beta = signal_substraction_params.beta;
