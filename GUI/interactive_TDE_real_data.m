@@ -258,8 +258,10 @@ function tdoa(handles,where)
             
             beta = str2num(get(handles.beta_lms_text,'String'));
             max_delay = str2num(get(handles.true_delay_samples_text, 'String'));
+            length_signal = str2num(get(handles.length_desired_samples, 'String'));
+            
             plot(handles.axes_tdoa,0)
-            [delay_samples,h,e] = delay_lms(preprocessed_signal1, preprocessed_signal2, max_delay, beta, handles);
+            [delay_samples,h,e] = delay_lms(preprocessed_signal1, preprocessed_signal2, max_delay, length_signal, beta, handles);
             plot(handles.axes_tdoa, h)
     end
     delay_seconds = delay_samples / Fs;
@@ -292,16 +294,26 @@ function stop_sound_2_Callback(hObject, eventdata, handles)
     stop(data2_player)
 
 
-function tdoa_options_Callback(hObject, eventdata, handles)
+function tdoa_options_Callback(hObject, ~, handles)
     % show option for beta (smoothing factor)
     method_options = cellstr(get(hObject,'String'));
     method_selected = method_options{get(hObject,'Value')};
     if(strcmp(method_selected,'LMS (Least Mean Squares)'))
         set(handles.beta_lms_text,'Visible', 'on')
         set(handles.text40,'Visible', 'on')
+        set(handles.text46,'Visible', 'on')
+        set(handles.length_desired_samples,'Visible', 'on')
+        set(handles.length_desired_seconds,'Visible', 'on')
+        set(handles.text47,'Visible', 'on')
+        set(handles.text48,'Visible', 'on')
     else
         set(handles.beta_lms_text,'Visible', 'off')
         set(handles.text40,'Visible', 'off')
+        set(handles.text46,'Visible', 'off')
+        set(handles.length_desired_samples,'Visible', 'off')
+        set(handles.length_desired_seconds,'Visible', 'off')
+        set(handles.text47,'Visible', 'off')
+        set(handles.text48,'Visible', 'off')
     end
         
 function plot_3D_sensors_Callback(~, ~, ~)
@@ -353,4 +365,23 @@ function toogle_debug_Callback(hObject, ~, ~)
         DEBUG = 1;
         set(hObject,'Label', 'Disable DEBUG')
     end
-        
+    
+function length_desired_seconds_Callback(hObject, ~, handles)
+    global Fs;
+    if isempty(Fs)
+        msgbox('Whats the frequency sample (Fs)? Seconds by themselves have no sense. Import first some data',...
+            'You forgot Fs','warn')
+        return
+    end
+    % show samples for the chosen true delay in seconds
+    seconds = str2num(get(hObject, 'String'));
+    samples = floor(seconds*Fs);
+    set(handles.length_desired_samples,'String', num2str(samples));
+
+
+function length_desired_samples_Callback(hObject, ~, handles)
+    % show seconds for the chosen true delay in samples
+    global Fs;
+    samples = str2num(get(hObject, 'String'));
+    seconds = samples/Fs;
+    set(handles.length_desired_seconds,'String', num2str(seconds));
