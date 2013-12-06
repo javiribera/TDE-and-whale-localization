@@ -1,6 +1,10 @@
 function output = percentile(input,percentile_params)
 
 %% Percentile noise substraction- ENPROCESO
+
+    % assure input vectors to be columns
+    input = input(:);
+    
 global Fs;
 percentil = percentile_params.percentil;
 c = percentile_params.c;
