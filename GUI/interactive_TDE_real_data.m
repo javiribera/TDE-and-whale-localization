@@ -385,3 +385,14 @@ function length_desired_samples_Callback(hObject, ~, handles)
     samples = str2num(get(hObject, 'String'));
     seconds = samples/Fs;
     set(handles.length_desired_seconds,'String', num2str(seconds));
+
+
+function toolbar_Callback(hObject, ~, handles)
+    if(strcmp(get(hObject,'Label'), 'Show Toolbar'))
+        set(hObject,'Label', 'Hide Toolbar')
+        set(handles.figure1,'Toolbar','figure')
+    else
+        set(hObject,'Label', 'Show Toolbar')
+        set(handles.figure1,'Toolbar','none')
+    end
+        
