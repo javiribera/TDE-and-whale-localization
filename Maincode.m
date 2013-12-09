@@ -1,6 +1,6 @@
 %Load Signal
 [Signal,sampling1,bits1] = wavread('27Apr09_174921_026_p1.wav');
-[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p5.wav');
+[Signal2,sampling2,bits2] = wavread('27Apr09_174921_026_p2.wav');
 
 %Times
 primerevento_inicial=13440000;
@@ -92,23 +92,26 @@ pwelch(real_noise,[],[],[],Fs);
         
         figure(1)  
 plot(Signalcortada)
+
 figure(2)  
 plot(Signal2cortada)
         
 
 %% Time Gain normalization
 
-Signalprocesada=time_gain(Signalcortada,0.9,1);
-Signal2procesada=time_gain(Signal2cortada,0.9,1);
+Signalprocesada=time_gain(Signalcortada);
+Signal2procesada=time_gain(Signal2cortada);
 
-%figure(1)
-%plot(Signalprocesada)
-%figure(2)
-%plot(Signalcortada)
-%figure(3) 
-%specgram(Signalprocesada,1024,Fs)
-%figure(4) 
-%specgram(Signalcortada,1024,Fs)
+figure(1)
+plot(Signalprocesada)
+figure(2)
+plot(Signalcortada)
+figure(3) 
+specgram(Signalprocesada,1024,Fs)
+figure(4) 
+specgram(Signalcortada,1024,Fs)
+%%
+Signalprocesada=Signalcortada;
 
 
 
@@ -133,31 +136,48 @@ specgram(Signalcortada,1024,Fs)
 Signalprocesada=spectralsubstraction(Signalcortada,Fs,5,0.0001);
 Signal2procesada=spectralsubstraction(Signal2cortada,Fs,5,0.0001);
 
-%figure(1)
-%plot(Signalprocesada)
-%figure(2)
-%plot(Signalcortada)
-%figure(3) 
-%specgram(Signalprocesada,1024,Fs)
-%figure(4) 
-%specgram(Signalcortada,1024,Fs)
-
-%% Frequency band normalization
-Signalresultant=freq_band(Signalcortada,Fs);
-Signal2resultant=freq_band(Signal2cortada,Fs);
-
-%PLOT ALL
-figure(1) 
-plot(Signalresultant)
+figure(1)
+plot(Signalprocesada)
 figure(2)
 plot(Signalcortada)
+figure(3) 
+specgram(Signalprocesada,1024,Fs)
+figure(4) 
+specgram(Signalcortada,1024,Fs)
 
+%% Entropy methods
+Signalprocesadan=Signalprocesada/norm(Signalprocesada);
+Signalcortadan=Signalcortada/norm(Signalcortada);
+entropy_procesada=entropy(Signalprocesadan)
+entropy_original=entropy(Signalcortadan)
 
+%%
+entropy_procesadaruido=entropy(Signalprocesada(1:96000))
+entropy_originalruido=entropy(Signalcortada(1:96000))
+entropy_procesadasenyal=entropy(Signalprocesada(96000*15.5:96000*16.5))
+entropy_originalsenyal=entropy(Signalcortada(96000*15.5:96000*16.5))
+%%
 
+%%SNR
+Signalcortadasenyal=Signalcortada(15.5*96000:16.5*96000);
+Signalprocesadasenyal=Signalprocesada(15.5*96000:16.5*96000);
+Signalcortadaruido=Signalcortada(1:5*96000);
+Signalprocesadaruido=Signalprocesada(1:5*96000);
 
+Signalcortadasenyal=Signalcortadasenyal-mean(Signalcortadasenyal);
+Signalprocesadasenyal=Signalprocesadasenyal-mean(Signalprocesadasenyal);
+Signalcortadaruido=Signalcortadaruido-mean(Signalcortadaruido);
+Signalprocesadaruido=Signalprocesadaruido-mean(Signalprocesadaruido);
 
+residual_noisesin=10*log10(var(Signalcortadaruido));
+residual_noisecon=10*log10(var(Signalprocesadaruido));
+speechsin=10*log10(var(Signalcortadasenyal));
+speechcon=10*log10(var(Signalprocesadasenyal));
+
+SNRsin=speechsin-residual_noisesin
+SNRcon=speechcon-residual_noisecon
 %% TK FILTER
-Signalcortada=teager_kaiser(Signalcortada);
+Signalprocesada=teager_kaiser(Signalcortada);
 Signal2cortada=teager_kaiser(Signal2cortada);
 
 %PLOT ALL
@@ -177,10 +197,26 @@ Signal2cortada=teager_kaiser(Signal2cortada);
 %plot(Signal2cortadatk);
 %ylabel('Amplitude');
 %linkaxes(ax,'x');
+%%
+%%
+[Signalprueba,Fs,bits1] = wavread('seno1.wav');
+[Signal2prueba,Fs,bits2] = wavread('seno2.wav');
+figure
+delaymax=96000*0.001
+[TDE,peak]=pruebadelay2(Signalprueba,Signal2prueba,delaymax,0.001);
+[val,ind]=max(peak);
+Best_estimate_TDOA=TDE(ind)
+subplot(2,1,1);
+plot(TDE);
+xlabel('Time (samples)'); ylabel('TDOA (samples)');
+subplot(2,1,2);
+plot(peak);
+xlabel('Time (samples)'); ylabel('peak');
 
 
 
 %% TDE PROCESS THE TIME DELAY STIMATION WITH CC GCC CTE,PHAT,SCOT
+
 gcc_mode = 'scot';
 gcc_mode1 = 'cc';
 gcc_mode3 = 'phat';
@@ -222,19 +258,62 @@ if DEBUG
   figure(3)
     plot(gscorr_ballena); title('gcorr Scot between whales');
 end
+%%
+delay_1=delay_ball_s;
+%%
+delay_2=delay_ball_s
+%%
+delay_3=delay_ball_s;
+%%
+delay_4=delay_ball_s
+%%
+delay_5=delay_ball_s;
+%%
+delay_6=delay_ball_s
+%%
+delay_7=delay_ball_s;
+%%
+delay_8=delay_ball_s
+%%
+delay_9=delay_ball_s;
+%%
+delay_10=delay_ball_s
+
+%%
+%%
+delay_11=delay_1;
+%%
+delay_12=delay_3
+%%
+delay_13=delay_4;
+%%
+delay_14=delay_9;
+%%
+delay_15=delay_ball_s;
+%%
+delay_16=delay_ball_s
+
+%%
+delay_11
+delay_12
+delay_13
+delay_14
+delay_15
+delay_16
+
+
 
 %%
 N=length(Signalprocesada);
-Signalprocesada=Signalprocesada(1:N-96000*5);
-Signal2procesada=Signal2procesada(1:N-96000*5);
+
 
 Signalprocesada=downsample(Signalprocesada,15);
 Signal2procesada=downsample(Signal2procesada,15);
-delaymax=6400*5;
+delaymax=4600*5;
 
-[TDE,peak]=pruebadelay2(Signalprocesada,Signal2procesada,delaymax,0.0001);
+[TDE,peak]=pruebadelay2(Signalprocesada,Signal2procesada,delaymax);
 [val,ind]=max(peak);
-Best_estimate_TDOA=TDE(ind);
+Best_estimate_TDOA=TDE(ind)
 subplot(2,1,1);
 plot(TDE);
 xlabel('Time (samples)'); ylabel('TDOA (samples)');
@@ -242,29 +321,64 @@ subplot(2,1,2);
 plot(peak);
 xlabel('Time (samples)'); ylabel('peak');
 %%
-subplot(2,2,1)
+subplot(3,1,1)
 specgram(Signalprocesada)
-[k,ind2]=max(TDE);
-time_delay=ind2-k;
-time_delay=time_delay*15/96000
 %%
+[x1,Fs]=wavread('chirp1');
+x2=wavread('chirp2');
+max_tdoa=1*Fs;
+Fs
+x1=x1/max(x1);
+x2=x2/max(x2);
 
+% make sure we work with column vectors
+x1 =x1(:);
+x2 =x2(:);
 
-%%INTERNET ALGORITHM
+% LMS initialization
+x1c = zeros(max_tdoa,1);
+x2c = zeros(max_tdoa,1);
+u = zeros(2*max_tdoa,1);
+u(max_tdoa/2) = 1;
+N = length(x1);
+e = zeros(1,N);
+tdoa = zeros(1,N);
+peak = zeros(1,N);
 
-Signalprocesada=downsample(Signalprocesada,3);
-Signal2procesada=downsample(Signal2procesada,3);
-delaymax=32000*5;
-[phi,delay]=doa_aevd2(Signalprocesada,Signal2procesada,7500,delaymax,delaymax*6,10,32000);
-[val,ind]=max(delay);
-ind
-Best_estimate_TDOA=delay(ind)
-subplot(2,1,1);
-plot(delay);
+% LMS loop
+tdoa=zeros(1,N); % preallocated, for speed
+for n=1:N
+    
+    x1c = [x1(n);x1c(1:end-1)];
+    x2c = [x2(n);x2c(1:end-1)];
+    R=cov(x1c,x2c);
+    EIG=eig(R);
+    lambda1=max(EIG);
+    lambda2=min(EIG);
+    mu=2/(lambda1+lambda2);
+    x = [x1c;x2c];
+    
+    e(n) = u'*x;
+    
+    u = u-mu*e(n)*x;
+    u(max_tdoa/2) = 1; %forcing g2 to an impulse response at max_tdoa/2
+    u = u/norm(u); %forcing ||u|| to 1
+    
+    [peak(n),ind] = min(u(max_tdoa+1:end));
+    peak(n)=-peak(n); % find the value of the (positive) impulse
+    tdoa(n) = ind-max_tdoa/2;
+    
+    
+    
+end
+
+[val,ind]=max(peak);
+Best_estimate_TDOA=abs(tdoa(ind))-abs(tdoa(ind+max_tdoa))
+plot(tdoa);
 xlabel('Time (samples)'); ylabel('TDOA (samples)');
 subplot(2,1,2);
-
-
+plot(peak);
+xlabel('Time (samples)'); ylabel('peak');
 
 %%
 
@@ -309,9 +423,131 @@ Nx = length(x1);
     
     %%
     %%Localization
-    
-    
-    
+    %% 5. Multilateration
+% In this final Section, we use the TDOAs estimated from real hydrophones
+% signals in Section 4, for estimating the position of the sperm whale on a
+% 2D map. We implement a rudimentary multilateration system, on the basis
+% of 2 TDOAs only. 
+% We first show the position of the hydrophones on the map, from their
+% (x,y) coordinates, and then plot the hyperbolas corresponding to each
+% pair of TDOA, assuming the speed of sound in water is 1510 m/s. Notice
+% we drop the first TDOA estimates, which the LMS algorithm used for
+% converging, and only use 10 estimates for our plot. 
+%
+% *MATLAB function involved:*
+% 
+% * |plot_hyp(x1,y1,x2,y2,a,color)| plots a hyperbola whose foci 
+% are (x1,y1) and (x2,y2), and whose semi-major axis is |a|
+
+hydrophone_pos = [-9617   6566    % sensor 1: x,y [meters]
+                  -2132   6635 % sensor 2: x,y
+                  5240    6520
+                  12844     6865
+                  -12402    -6183
+                  -4874      -6183
+                  9784      -6129];  % sensor 3: x,y
+plot(hydrophone_pos(:,1),hydrophone_pos(:,2),'o');
+
+text(hydrophone_pos(1,1),hydrophone_pos(1,2),'  1');
+text(hydrophone_pos(2,1),hydrophone_pos(2,2),'  2');
+text(hydrophone_pos(3,1),hydrophone_pos(3,2),'  3');
+text(hydrophone_pos(4,1),hydrophone_pos(4,2),'  4');
+text(hydrophone_pos(5,1),hydrophone_pos(5,2),'  5');
+text(hydrophone_pos(6,1),hydrophone_pos(6,2),'  6');
+text(hydrophone_pos(7,1),hydrophone_pos(7,2),'  7');
+
+xlabel('x (m) red 2-3  blue 1-2  green 1-3   yellow 4-3   black  1-4   magenta  2-4    yellow 5-1   cyan 5-2    blue 5-3    green 5-4'); ylabel('y (m)');
+hold on;
+
+
+% Keeping 10 TDOA estimates 
+
+
+sound_speed=1510; % m/s
+
+   plot_hyp(hydrophone_pos(1,1), hydrophone_pos(1,2), ...
+            hydrophone_pos(2,1), hydrophone_pos(2,2), ...
+            -delay_1*sound_speed/2,'b');
+   plot_hyp(hydrophone_pos(2,1), hydrophone_pos(2,2), ...
+            hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            -delay_2*sound_speed/2,'r');
+        plot_hyp(hydrophone_pos(1,1), hydrophone_pos(1,2), ...
+            hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            -delay_3*sound_speed/2,'g');
+        plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(4,1), hydrophone_pos(4,2), ...
+            -delay_4*sound_speed/2,'y');
+        plot_hyp(hydrophone_pos(1,1), hydrophone_pos(1,2), ...
+            hydrophone_pos(4,1), hydrophone_pos(4,2), ...
+            -delay_5*sound_speed/2,'k');
+        plot_hyp(hydrophone_pos(2,1), hydrophone_pos(2,2), ...
+            hydrophone_pos(4,1), hydrophone_pos(4,2), ...
+            -delay_6*sound_speed/2,'m');
+        plot_hyp(hydrophone_pos(1,1), hydrophone_pos(1,2), ...
+            hydrophone_pos(5,1), hydrophone_pos(5,2), ...
+            -delay_7*sound_speed/2,'y');
+        plot_hyp(hydrophone_pos(2,1), hydrophone_pos(2,2), ...
+            hydrophone_pos(5,1), hydrophone_pos(5,2), ...
+            -delay_8*sound_speed/2,'c');
+        plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(5,1), hydrophone_pos(5,2), ...
+            -delay_9*sound_speed/2,'b');
+        plot_hyp(hydrophone_pos(4,1), hydrophone_pos(4,2), ...
+            hydrophone_pos(5,1), hydrophone_pos(5,2), ...
+            -delay_10*sound_speed/2,'g');
+        
+hold off;
+
+%%
+hydrophone_pos = [-9617   6566    % sensor 1: x,y [meters]
+                  -2132   6635 % sensor 2: x,y
+                  5240    6520
+                  12844     6865
+                  -12402    -6183
+                  -4874      -6183
+                  9784      -6129
+                  5000      15500];  % sensor 3: x,y
+plot(hydrophone_pos(:,1),hydrophone_pos(:,2),'.');
+
+text(hydrophone_pos(1,1),hydrophone_pos(1,2),'  1');
+text(hydrophone_pos(2,1),hydrophone_pos(2,2),'  2');
+text(hydrophone_pos(3,1),hydrophone_pos(3,2),'  3');
+text(hydrophone_pos(4,1),hydrophone_pos(4,2),'  4');
+text(hydrophone_pos(5,1),hydrophone_pos(5,2),'  5');
+text(hydrophone_pos(6,1),hydrophone_pos(6,2),'  6');
+text(hydrophone_pos(7,1),hydrophone_pos(7,2),'  7');
+
+xlabel('y (m) blue 3-1   red 3-1    green 3-4   yellow 3-5   black 3-6    magenta  3-7'); ylabel('z (m)');
+hold on;
+
+
+% Keeping 10 TDOA estimates 
+
+
+sound_speed=1510; % m/s
+
+   plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(1,1), hydrophone_pos(1,2), ...
+            -delay_11*sound_speed/2,'b');
+   plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(2,1), hydrophone_pos(2,2), ...
+            -delay_12*sound_speed/2,'r');
+        plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(4,1), hydrophone_pos(4,2), ...
+            -delay_13*sound_speed/2,'g');
+        plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(5,1), hydrophone_pos(5,2), ...
+            -delay_14*sound_speed/2,'y');
+        plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(6,1), hydrophone_pos(6,2), ...
+            -delay_15*sound_speed/2,'k');
+        plot_hyp(hydrophone_pos(3,1), hydrophone_pos(3,2), ...
+            hydrophone_pos(7,1), hydrophone_pos(7,2), ...
+            -delay_16*sound_speed/2,'m');
+ 
+        
+hold off;
+
 
 
 %% DEBUG: no need of aux. variables

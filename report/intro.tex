@@ -1,0 +1,54 @@
+% The very first letter is a 2 line initial drop letter followed
+% by the rest of the first word in caps.
+% 
+% form to use if the first word consists of a single letter:
+% \IEEEPARstart{A}{demo} file is ....
+% 
+% form to use if you need the single drop letter followed by
+% normal text (unknown if ever used by IEEE):
+% \IEEEPARstart{A}{}demo file is ....
+% 
+% Some journals put the first two words in caps:
+% \IEEEPARstart{T}{his demo} file is ....
+% 
+% Here we have the typical use of a "T" for an initial drop letter
+% and "HIS" in caps to complete the first word.
+\subsection{Motivation}
+  \IEEEPARstart{T}{his} topic was proposed by Ludwig Houégnigan from the \textit{Laboratori d'Aplicacions Bioacústiques} at \textit{Universitat Politècnica de Catalunya} so it can be useful for their research areas.
+
+  The goal is to obtain a solid knowledge of the convenience of some methods used to track the position of cetaceans underwater. Human activities that disrupt marine animal environments such as ships often end up with collisions with cetaceans \cite{collisions}. This leads to injuries and even death for the animals and a danger for sea navigation \cite{youtube-collisions}. Not only vessels in the high seas but also coast cruises face these issues, especially where both whale and ship densities are concentrated. Unfortunately, many incidents of ship strike around the coast go unnoticed or unreported, and this makes it difficult to understand the scope of the problem \cite{web-collisions}.
+
+  Thus, a whale anti-collision system to warn ships in an area about whale locations is required. Moreover, spotting whales positions is also useful for scientific applications such as animal census, behaviour studies, environmental conservation, etc.
+
+\subsection{Scope of the project}
+  The following algorithms to compute the TDE have been implemented in MATLAB\footnote{Except simple cross-correlation, for which the simple built-in MATLAB function \emph{xcorr} has been used.}:
+  \begin{itemize}
+    \item Cross-correlation (CC)
+    \item Generalized cross-correlation Phase Transform (GCC-PHAT)
+    \item GCC Smoothed Coherence Transform (GCC-SCOT)
+    \item Adaptive Least Mean Squares (LMS)
+    \item Adaptive Eigenvalue Decomposition (AED)
+  \end{itemize}
+  \vspace{5pt}
+  
+
+  Although, direct use of these algorithms do not yield good results. Hence, some preconditioning methods must be applied previously to the hydrophones recordings. The following filters have also been implemented:
+  \begin{itemize}
+    \item Pass-band filter
+    \item Percentile noise removal
+    \item Spectral substraction
+    \item Time gain normalization
+    \item Teager-Kaiser
+  \end{itemize}
+  \vspace{5pt}
+  
+  In addition, a handy straight-forward GUI has been built in order to rapidly compare the algorithms and assess its pros and cons on each kind of signal. Such GUI allows to visually:
+  \begin{itemize}
+    \item Import a pair of raw \textit{.wav} signals
+    \item Select a time segment of this signals in minutes and seconds
+    \item Plot their time evolution or spectrogram
+    \item Apply any combination of the preprocessing methods
+    \item Choose the desired TDE algorithms to assess
+    \item Visualize the 3D disposition of the underwater sensors
+  \end{itemize}
+  \vspace{5pt}

@@ -1,0 +1,15 @@
+With a time delay and the known position of the sensors, a loci of possible points of the source get defined. For each pair of sensors, a hyperbola of possible points is defined. So, later on, with another pair of microphones, the intersection yields to the source localization.
+
+In our short experiment, for tracking a minke whale on a 2D map, we have developed a rudimentary multilateration system, on the basis of 6 TDOAs only. The localization by itself leads to a non-linear solution. In addition, non-idealities imply a no unique solution, so we have a possible zone where the source could be located. We have not gone so far, but the estimated position could have been estimated by algorithms such as Crossing Lines or Steered-response power.
+
+We first show the position of the hydrophones on the map, and then plot the hyperbolas corresponding to each pair of TDOA, assuming the speed of sound in water is 1510 m/s.  We have used the Time delay Estimation between the sensor 1 and all the other ones, after having pre-processed the signals with PNR and doing the estimation with the Generalised Cross-Correlation Smoothed Coherence Transform. 
+
+\begin{figure*}[htb]
+	\begin{center}
+		\includegraphics[width=1\textwidth]{figures/7_local.png}
+	\end{center}
+	\caption{Localization of the minke whale through multilateratization between sensor 1 and the rest.}
+	\label{fig:local}
+\end{figure*}
+
+Then, looking at Figure \ref{fig:local}, we have obtained 7 curves that ideally will intersect at one point. In our case, it is quite normal that the curves don't intersect all, but we can see where the whale is approximately, as the curves intersect in a little area. The first 5 curves have a time delay estimation less 1\% and 1\% of \SI{12}{\kilo\meter}, so our resolution is \SI{120}{\meter}. That is why the curves don't match in one point. Nevertheless, we do a rough visual estimation so the whale is at the position x=13700 y=5300.
