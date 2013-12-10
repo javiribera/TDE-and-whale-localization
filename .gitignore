@@ -1,6 +1,4 @@
-data
-*.wav
+raw-data/*
 *~
 ~*
 *Thumbs*
-*.mat
