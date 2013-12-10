@@ -11,7 +11,7 @@ The passive TDOA approach and the underwater environment imply some inconvenient
   \item Correlated noise, as the main contribution to it is not white noise, but strong interferences from other animals, devices and water currents.
   \item Reflections on the water surface, mainly. This can make the algorithm to get confused by them and could return a wrong result. Reflections on the seafloor are negligible, as hydrophones are usually placed very near to the ground.
   \item The recordings will not be just a shifted version of the other ones. Noise, reflections and interferences will introduce huge bias and variance in the estimation if not treated correctly.
-  \item Sources (whales) will not be still, so delayed will not be a constant in the long-run.
+  \item Sources (whales) will not be still, so the delay will not be a constant in the long-run.
 \end{enumerate}
 
 \vspace{5pt}
@@ -31,6 +31,6 @@ The passive TDOA approach and the underwater environment imply some inconvenient
   $$ r_1[n] = h_1[n]^T s[n] + w_1[n] $$
   $$ r_2[n] = h_2[n]^T s[n] + w_2[n] $$
   
-  In an ideal case, $h_k[n]$ would be a Kronecker delta at the delay position, so $h_k[n] = [0\ 0\ ...\ \alpha\ ...\ 0\ 0]$, but in general, as indicated in the last con to face, distorsion and reflections can make the impulse response of the channel to be any kind \cite{overview}.
+  In an ideal case, $h_k[n]$ would be a Kronecker delta at the delay position, so $h_k[n] = [0\ 0\ ...\ \alpha\ ...\ 0\ 0]$, but in general, as indicated in the fifth con to face, distorsion and reflections can make the impulse response of the channel to be any kind \cite{overview}.
   $$ h_k[n] = [h_0\ h_1\ ...\ h_{L-1}] $$
   

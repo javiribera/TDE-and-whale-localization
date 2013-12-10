@@ -11,13 +11,13 @@ In order to get a TDE, some algorithms were developed and a brief explanation of
 
 \subsection{Generalized cross-correlation}
 The generalized cross-correlation (GCC) is a generalization of the cross-correlation in the frequency domain. It is computed as follows:
-$$R_{GCC_{x_1[k] x_2[k]}}[m] = \sum_{k=0}^{M-1} \Phi[k]\ \text{IFFT}_M(S_{x_1x_2})[k]$$
+$$R_{GCC_{x_1[k] x_2[k]}}[m] = \text{IFFT}_M\{\Phi[k]S_{x_1x_2}[k]\}[m]$$
 
 Where $S_{x_1x_2}$ is the cross-spectrum of the input signals, and for a finite-length sequence it should be approximated as $E\{X_1[k]X^*_2[k]\} $, where $X_j[k]$ denotes the discrete Fourier transform (DFT) of the input signal $x_j[n]$ and $(\cdotp)^*$ the complex conjugate operator.
 
 The function $\Phi[k]$ is the weighting filter. Depending of the chosen weighting filter, the GCC behaves diferent. As seen, the idea is to compute a cross-correlation with some frequency filtering. The weighting filter $\Phi[k]=1$ returns the classical cross-correlation.
 
-The two implemented weighting filters have been Phase Transform (GCC-PHAT) and Smoothed Coherence Transform (GCC-SCOT). The former makes use of only the phase of the signals by using as a weighting filter $\Phi_{\text{PHAT}}[k]=\frac{1}{|S_{x_0x_1}[k]|}$. This method, though, has not yield good results in this case-study. The latter, GCC-SCOT, uses $\Phi_{\text{SCOT}}[k]=\frac{1}{\sqrt{X_1[k]X^*_2[k]}}$. The SCOT method returned much better results than PHAT. Their MATLAB implementations can be shown at file \emph{gcc.m}\cite{gcc}.
+The two implemented weighting filters have been Phase Transform (GCC-PHAT) and Smoothed Coherence Transform (GCC-SCOT). The former makes use of only the phase of the signals by using as a weighting filter $\Phi_{\text{PHAT}}[k]=\frac{1}{|S_{x_1x_2}[k]|}$. This method, though, has not yield good results in this case-study. The latter, GCC-SCOT, uses $\Phi_{\text{SCOT}}[k]=\frac{1}{\sqrt{X_1[k]X^*_2[k]}}$. The SCOT method returned much better results than PHAT. Their MATLAB implementations can be shown at file \emph{gcc.m}\cite{gcc}.
 
 The TDE with GCC is computed the same way as in the classical CC: taking the maximum value, as can bee seen in file \emph{delay\_gcc.m}\cite{delaygcc}.
 
