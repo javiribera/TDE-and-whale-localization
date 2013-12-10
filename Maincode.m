@@ -118,18 +118,25 @@ Signalprocesada=Signalcortada;
 
 %%
 %PERCENTIL NOISE REMOVAL
-Signalprocesada=percentile(Signalcortada,90,Fs,5);
-Signal2procesada=percentile(Signal2cortada,90,Fs,5);
+Signalprocesada=percentile(Signalcortada,75,Fs,5);
+Signal2procesada=percentile(Signal2cortada,75,Fs,5);
 
 figure(1)
+subplot(2,1,2)
 plot(Signalprocesada)
-figure(2)
+xlabel('Time (samples)'); ylabel('Amplitude');
+subplot(2,1,1)
 plot(Signalcortada)
-figure(3) 
-specgram(Signalprocesada,1024,Fs)
-figure(4) 
-specgram(Signalcortada,1024,Fs)
+xlabel('Time (samples)'); ylabel('Amplitude');
 
+
+figure(3) 
+subplot(2,1,2)
+specgram(Signalprocesada,1024,Fs)
+xlabel('Time (samples)'); ylabel('Frequency');
+subplot(2,1,1)
+specgram(Signalcortada,1024,Fs)
+xlabel('Time (samples)'); ylabel('Frequency');
   
 %%
 %Spectralsubstraction
@@ -307,19 +314,22 @@ delay_16
 N=length(Signalprocesada);
 
 
-Signalprocesada=downsample(Signalprocesada,15);
-Signal2procesada=downsample(Signal2procesada,15);
-delaymax=4600*5;
+Signalprocesada=downsample(Signalprocesada,10);
+Signal2procesada=downsample(Signal2procesada,10);
+delaymax=9600*5;
 
 [TDE,peak]=pruebadelay2(Signalprocesada,Signal2procesada,delaymax);
 [val,ind]=max(peak);
 Best_estimate_TDOA=TDE(ind)
+%%
+
+figure
 subplot(2,1,1);
 plot(TDE);
 xlabel('Time (samples)'); ylabel('TDOA (samples)');
 subplot(2,1,2);
-plot(peak);
-xlabel('Time (samples)'); ylabel('peak');
+specgram(Signal2procesada,1024,Fs);
+xlabel('Time (samples)'); ylabel('Frequency');
 %%
 subplot(3,1,1)
 specgram(Signalprocesada)
