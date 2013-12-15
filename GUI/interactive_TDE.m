@@ -1,6 +1,6 @@
-function varargout = interactive_TDE_real_data(varargin)
-    %      INTERACTIVE_TDE_REAL_DATA('CALLBACK',hObject,eventData,handles,...) calls the local
-    %      function named CALLBACK in INTERACTIVE_TDE_REAL_DATA.M with the given input arguments.
+function varargout = interactive_TDE(varargin)
+    %      interactive_TDE('CALLBACK',hObject,eventData,handles,...) calls the local
+    %      function named CALLBACK in interactive_TDE.M with the given input arguments.
     
     % Change always to root folder
     currentpath=pwd;
@@ -13,8 +13,8 @@ function varargout = interactive_TDE_real_data(varargin)
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
                        'gui_Singleton',  gui_Singleton, ...
-                       'gui_OpeningFcn', @interactive_TDE_real_data_OpeningFcn, ...
-                       'gui_OutputFcn',  @interactive_TDE_real_data_OutputFcn, ...
+                       'gui_OpeningFcn', @interactive_TDE_OpeningFcn, ...
+                       'gui_OutputFcn',  @interactive_TDE_OutputFcn, ...
                        'gui_LayoutFcn',  [] , ...
                        'gui_Callback',   []);
     if nargin && ischar(varargin{1})
@@ -29,15 +29,15 @@ function varargout = interactive_TDE_real_data(varargin)
     % End  DO NOT EDIT
 
 
-% --- Executes just before interactive_TDE_real_data is made visible.
-function interactive_TDE_real_data_OpeningFcn(hObject, ~, handles, varargin)
-    % Choose default command line output for interactive_TDE_real_data
+% --- Executes just before interactive_TDE is made visible.
+function interactive_TDE_OpeningFcn(hObject, ~, handles, varargin)
+    % Choose default command line output for interactive_TDE
     handles.output = hObject;
 
     % Update handles structure
     guidata(hObject, handles);
 
-    % UIWAIT makes interactive_TDE_real_data wait for user response (see UIRESUME)
+    % UIWAIT makes interactive_TDE wait for user response (see UIRESUME)
     % uiwait(handles.figure1);
     
     % plot indications for the user
@@ -53,7 +53,7 @@ function interactive_TDE_real_data_OpeningFcn(hObject, ~, handles, varargin)
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = interactive_TDE_real_data_OutputFcn(~, ~, handles) 
+function varargout = interactive_TDE_OutputFcn(~, ~, handles) 
     % varargout  cell array for returning output args (see VARARGOUT);
     % hObject    handle to figure
     % eventdata  reserved - to be defined in a future version of MATLAB
