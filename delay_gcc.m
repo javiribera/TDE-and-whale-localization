@@ -1,8 +1,6 @@
 function estimated_delay = delay_gcc( input1, input2, method )
-    % Estima el delay de 2 señales usando la función
-    % gcc de Dutroit y el máximo
-    % ¿qué hacemos si hay más de un máximo?
-    %  (poco probable en señales reales) de momento he cogido el último
+    % DELAY_GCC Estimates the delay of 2 signals using the function GCC.m,
+    % the weighting filter METHOD and taking the maximum
     
     if length(input1) ~= length(input2)
         error('- ¡Both inputs must be the same length to correlate them!');
