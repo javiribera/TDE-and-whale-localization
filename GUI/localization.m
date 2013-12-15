@@ -72,23 +72,32 @@ function varargout = localization_OutputFcn(hObject, eventdata, handles)
 
 
 function localize_button_Callback(~, ~, handles)
-%     delay12 = str2num(get(handles.delay12, 'String'));
-%     delay13 = str2num(get(handles.delay13, 'String'));
-%     delay14 = str2num(get(handles.delay14, 'String'));
-%     delay15 = str2num(get(handles.delay15, 'String'));
-%     delay16 = str2num(get(handles.delay16, 'String'));
-%     delay17 = str2num(get(handles.delay17, 'String'));
+    % get the TDEs from the GUI
+    delay12 = str2num(get(handles.delay12, 'String'));
+    delay13 = str2num(get(handles.delay13, 'String'));
+    delay14 = str2num(get(handles.delay14, 'String'));
+    delay15 = str2num(get(handles.delay15, 'String'));
+    delay16 = str2num(get(handles.delay16, 'String'));
+    delay17 = str2num(get(handles.delay17, 'String'));
     % in secs.
     
-    sensor1 = [6566 -9617 -4500]/1000;
-    sensor2 = [6635 -2132 -4500]/1000;
-    sensor3 = [6520 5240 -4650]/1000;
-    sensor4 = [6865 12844 -4750]/1000;
-    sensor5 = [-6163 -12402 -4600]/1000;
-    sensor6 = [-6183 -4874 -4650]/1000;
-    sensor7 = [-6129 9784 -4750]/1000;
+    % get the speed of sound from the GUI
+    if (isempty(get(handles.sound_speed,'String')))
+        msgbox('Type the speed of sound in the textfield of the GUI',...
+            'Speed of sound?','warn')
+        return
+    end    
+    sound_speed=str2num(get(handles.sound_speed,'String')); % m/s
+    
+    % position of the sensors in an array
+    sensor1 = [6566 -9617 -4500];%/1000;
+    sensor2 = [6635 -2132 -4500];%/1000;
+    sensor3 = [6520 5240 -4650];%/1000;
+    sensor4 = [6865 12844 -4750];%/1000;
+    sensor5 = [-6163 -12402 -4600];%/1000;
+    sensor6 = [-6183 -4874 -4650];%/1000;
+    sensor7 = [-6129 9784 -4750];%/1000;
     % in km.
-
     sensors_pos = [ sensor1;
                     sensor2;
                     sensor3;
@@ -98,39 +107,62 @@ function localize_button_Callback(~, ~, handles)
                     sensor7;
                   ];
           
+    % plot sensors as points and label them
     plot(handles.axes_localization,sensors_pos(:,1),sensors_pos(:,2),'.');
+    text(sensors_pos(1,1),sensors_pos(1,2),'  1');
+    text(sensors_pos(2,1),sensors_pos(2,2),'  2');
+    text(sensors_pos(3,1),sensors_pos(3,2),'  3');
+    text(sensors_pos(4,1),sensors_pos(4,2),'  4');
+    text(sensors_pos(5,1),sensors_pos(5,2),'  5');
+    text(sensors_pos(6,1),sensors_pos(6,2),'  6');
+    text(sensors_pos(7,1),sensors_pos(7,2),'  7');
+    
+    % plot beautify
+    title('TDOA. blue 1-2   red 1-3    green 1-4   yellow 1-5   black 1-6    magenta  1-7')
+    ylabel('y(m)');  xlabel('x(m)');
+    axis(3*[min(sensors_pos(:,1)) max(sensors_pos(:,1)) min(sensors_pos(:,2)) max(sensors_pos(:,2))]);
 
-    text(handles.axes_localization,sensors_pos(1,1),sensors_pos(1,2),'  1');
-    text(handles.axes_localization,sensors_pos(2,1),sensors_pos(2,2),'  2');
-    text(handles.axes_localization,sensors_pos(3,1),sensors_pos(3,2),'  3');
-    text(handles.axes_localization,sensors_pos(4,1),sensors_pos(4,2),'  4');
-    text(handles.axes_localization,sensors_pos(5,1),sensors_pos(5,2),'  5');
-    text(handles.axes_localization,sensors_pos(6,1),sensors_pos(6,2),'  6');
-    text(handles.axes_localization,sensors_pos(7,1),sensors_pos(7,2),'  7');
-
-    xlabel('y (m) blue 1-2   red 1-3    green 1-4   yellow 1-5   black 1-6    magenta  1-7'); ylabel('z (m)');
+    % plot hyperbolas of TDEs
     hold on;
-
-    sound_speed=str2num(get(handles.sound_speed,'String')); % m/s
-
-   plot_hyp(sensors_pos(3,1), sensors_pos(3,2), ...
-            sensors_pos(1,1), sensors_pos(1,2), ...
-            -delay12*sound_speed/2,'b');
-   plot_hyp(sensors_pos(3,1), sensors_pos(3,2), ...
+    plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
             sensors_pos(2,1), sensors_pos(2,2), ...
+            -delay12*sound_speed/2,'b');
+    plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
+            sensors_pos(3,1), sensors_pos(3,2), ...
             -delay13*sound_speed/2,'r');
-        plot_hyp(sensors_pos(3,1), sensors_pos(3,2), ...
+        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
             sensors_pos(4,1), sensors_pos(4,2), ...
             -delay14*sound_speed/2,'g');
-        plot_hyp(sensors_pos(3,1), sensors_pos(3,2), ...
+        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
             sensors_pos(5,1), sensors_pos(5,2), ...
             -delay15*sound_speed/2,'y');
-        plot_hyp(sensors_pos(3,1), sensors_pos(3,2), ...
+        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
             sensors_pos(6,1), sensors_pos(6,2), ...
             -delay16*sound_speed/2,'k');
-        plot_hyp(sensors_pos(3,1), sensors_pos(3,2), ...
+        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
             sensors_pos(7,1), sensors_pos(7,2), ...
             -delay17*sound_speed/2,'m');
-
-
     hold off;
+
+function toogle_debug_Callback(hObject, ~, ~)
+    global DEBUG;
+    if DEBUG
+        DEBUG = 0;
+        set(hObject,'Label', 'Enable DEBUG')
+    else
+        DEBUG = 1;
+        set(hObject,'Label', 'Disable DEBUG')
+    end
+    
+function toolbar_Callback(hObject, ~, handles)
+    if(strcmp(get(hObject,'Label'), 'Show Toolbar'))
+        set(hObject,'Label', 'Hide Toolbar')
+        set(handles.figure1,'Toolbar','figure')
+    else
+        set(hObject,'Label', 'Show Toolbar')
+        set(handles.figure1,'Toolbar','none')
+    end
+        
+function plot_3D_sensors_Callback(~, ~, ~)
+    addpath 'utils'
+    plot3Dsensors

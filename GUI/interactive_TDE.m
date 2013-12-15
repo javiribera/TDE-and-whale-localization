@@ -47,8 +47,6 @@ function interactive_TDE_OpeningFcn(hObject, ~, handles, varargin)
     text(0.25,0.5,'Select an hydrophone 2 and plot it')
     
     % reset global variables
-%     global data1_FileName data1_PathName data2_FileName data2_PathName Ti_minutes Tf_minutes Tf_seconds Ti_seconds  Ti Tf data1 data2 Fs
-%     data1_FileName = ''; data1_PathName = ''; data2_FileName=''; data2_PathName=''; Ti_minutes=0;  Tf_minutes=0; Tf_seconds=0; Ti_seconds=0; Ti=0; Tf=0; data1=0; data2=0; Fs=0;
     clear all; clc;
 
 
