@@ -1,41 +1,47 @@
-Prior to the delay detection, it is not only useful, but also necessary, to preprocess the filter in some way. Usually, TDE block gets confused by noise, reflections and variance in the power throughout time. Each preconditioning method tries to solve these problem.
+Prior to the delay detection, it is not only useful, but also necessary, to preprocess the filter in some way. Usually, TDE block gets confused by noise, reflections and variance in the power throughout time. Each preconditioning method tries to solve some of these problems.
 \subsection{Time Gain Normalization}
   Time Gain Normalization algorithm tries to fit the average amplitude to a fixed level, by calculating the long-term average level $\overline{x}[n]$ using a smoothing time averaging parameter $\alpha$ and a $L^P$ norm the following way:
-  $$ \overline{x[n]} = (\alpha \overline{x}^P[n-1] + (1-\alpha) |\overline{x}[n]|^P ) ^{\frac{1}{P}} $$
+  \begin{dmath}
+    \overline{x}[n] = (\alpha \overline{x}^P[n-1] + (1-\alpha) |\overline{x}[n]|^P ) ^{\frac{1}{P}}
+  \end{dmath}
   
-  So, the output signal with normalized gain $r^2$ can be computed as
-  $$ x_{norm}[n] = r \frac{x[n]}{\overline{x}[n-1]} $$
+  Then, the output signal with a normalized gain of $r^2$ can be computed as
+  \begin{dmath}
+    x_{norm}[n] = r \frac{x[n]}{\overline{x}[n-1]}
+  \end{dmath}
   
-  The implementation of Time Gain Normalization can be seen in file \emph{time\_gain.m}\cite{timegain}.
+  The implementation of Time Gain Normalization can be seen in the file \emph{time\_gain.m}\cite{timegain.m}.
   
 \subsection{Spectral Substraction}
   Spectral subtraction is a method for restoration of the power spectrum or the magnitude spectrum of a signal observed in additive noise, through subtraction of an estimate of the average noise spectrum from the noisy signal spectrum. The noise spectrum is usually estimated, and then updated from the periods when the signal is absent and only the noise is present. We did the assumption that the noise is a stationary or a slowly varying process, and that the noise spectrum does not change significantly between the update periods \cite{speech}. 
 
   For restoration of time-domain signals, an estimate of the instantaneous magnitude spectrum is combined with the phase of the noisy signal, and then transformed via an inverse discrete Fourier transform to the time domain. 
 
-  In terms of computational complexity, spectral subtraction is relatively inexpensive. The magnitude and power spectrum are non-negative variables, and any negative estimates of these variables should be mapped into non-negative values. This nonlinear rectification process provoke a distortion in the cleaned signal. The processing distortion becomes more noticeable as the signal-to-noise ratio decreases. To diminish the distortion due to the harder spectrum attenuation, we have added the spectral floor (Beta) to limit the subtraction and force some residual noise in the output.
+  In terms of computational complexity, spectral subtraction is relatively inexpensive. The magnitude and power spectrum are non-negative variables, and any negative estimates of these variables should be mapped into non-negative values. This nonlinear rectification process provoke a distortion in the cleaned signal. The processing distortion becomes more noticeable as the signal-to-noise ratio decreases. To diminish the distortion due to the harder spectrum attenuation, we have added the spectral floor ($\beta$) to limit the subtraction and force some residual noise at the output.
   
-  We can observe the algorithm with the spectral floor:
-  $$
-  |X|^2 = \left\{  \begin{array}{rl}
-    |Y|^2-\alpha |N|^2    &\mbox{ if  $|X|^2>\beta |N|^2$ } \\
-    \beta |N|^2   &\mbox{ otherwise } 
-  \end{array} \right.
-  $$
+  The algorithms computes the clean signal as follows:
+  \begin{dmath}
+    |X[k]|^2 = \left\{  \begin{array}{rl}
+      |Y[k]|^2-\alpha |N[k]|^2    &\mbox{ if  $|X[k]|^2>\beta |N[k]|^2$ } \\
+      \beta |N[k]|^2   &\mbox{ otherwise } 
+    \end{array} \right.
+  \end{dmath}
   
-  Where $X$ is the spectrum of the clean signal, $Y$ is the noise signal, $N$ is the estimated noise spectrum, $\alpha$ is the oversubtraction parameter and $\beta$ is the spectral floor.
+  Where $X$ is the spectrum of the clean signal, $Y$ is the noisy signal, $N$ is the estimated noise spectrum, $\alpha$ is the oversubtraction parameter and $\beta$ is the spectral floor.
   
-  The implementation of Spectral Substraction can be seen in file \emph{spectralsubstraction.m}\cite{timegain}.
+  The implementation of Spectral Substraction can be seen in file \emph{spectralsubstraction.m}\cite{spectralsubstraction.m}.
 
 \subsection{Percentile Noise Removal}
-  Percentile Noise removal is a method for restoration of the power spectrum through substraction of an estimate of the percentile nth of the noise spectrum from the noisy signal spectrum. The noise spectrum is usually estimated like in the spectral subtraction method. Then, we apply the percentile function to this noise spectrum. All of this steps are updated from the periods when the signal is absent and only the noise is present. Finally, we subtract the product of the percentile estimation with a constant to the Spectrogram of the signal. The value of the constant has been fixed to 5 because is the optimum in terms of SNR.
+  Percentile Noise Removal (PNR) is a method for restoration of the power spectrum through substraction of an estimate of the percentile nth of the noise spectrum from the noisy signal spectrum. The noise spectrum is usually estimated like in the spectral subtraction method. Then, we apply the percentile function to this noise spectrum. All of this steps are updated from the periods when the signal is absent and only the noise is present. Finally, we subtract the product of the percentile estimation with a constant to the Spectrogram of the signal. The chosen value in many of our simulations was 5 after trial and error.
 
   We did the assumption that the noise is a stationary or a slowly varying process, and that the noise spectrum does not change significantly between the update periods. The magnitude and power spectrum are non-negative variables, and any negative estimates of these variables should be mapped into 0. 
 
-  To proposed percentile value is 90. It has been elected because of is the optimum value and where the curve of spectrogram-percentile is flattest. Note that if we put nth=50, the Percentile Noise Removal is more or less the same algorithm than Spectral Subtraction, since the nth=50 means to do the median of the estimated noise spectrum and the Spectral Subtraction use the average of the noise spectrum.
+  To proposed percentile value is 90. It has been elected because it is the optimum value in our case, where the curve of spectrogram-percentile is flattest. Note that if we take nth=50, the Percentile Noise Removal is very similar to Spectral Subtraction, since the nth=50 means to take the median of the estimated noise spectrum and the Spectral Subtraction uses the average of the noise spectrum.
   
-  Here we can observe the PNR algorithm:
-  $$ S(t,f)'= max\{S(t,f)- c_{\text{N90}},0\} $$
-  where $S(t,f)'$ is the spectrogram of the clean signal, $S(t,f)$ is the spectrogram of the noisy signal, $c$ is the oversubtraction parameter and N90 is the 90 percentile of the estimated noise spectrogram.
+  The PNR algorithm is comptued as follows:
+  \begin{dmath}
+    S(t,f)'= max\{S(t,f)- c N,0\}
+  \end{dmath}
+  where $S(t,f)'$ is the spectrogram of the clean signal, $S(t,f)$ is the spectrogram of the noisy signal, $c$ is the oversubtraction parameter and N is the chosen percentile of the estimated noise spectrogram.
   
-  The implementation of Percentile Noise Removal can be seen in file \emph{percentile.m}\cite{percentile}.
+  The implementation of Percentile Noise Removal can be seen in file \emph{percentile.m}\cite{percentile.m}.

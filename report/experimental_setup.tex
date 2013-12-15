@@ -22,16 +22,16 @@
   
   The dataset is from the 27th of April 2009 at approximately 12:00 Hawaiian standard time. Thirty minutes of data from each hydrophone are provided as three files (approx. 10 minutes per file). The sampling rate of the recordings (Windows PCM .wav format) is $Fs=\SI{96}{\kilo\Hz}$ with 16 bits resolution. The data are sampled simultaneously, so sample N from one file is the same relative time as sample N of a second file with the same filename. The file format is .wav in little-endian format.
   
-  The test signals used to assess the proper implementation of the algorithms were two chirps, two pure tones and white noise delayed a desired number of samples. The implementation of its creation can be seen in file \emph{init\_test\_signals.m}\cite{inittestsignals}.
+  The test signals used to assess the proper implementation of the algorithms were two chirps, two pure tones and white noise delayed a desired number of samples. The implementation of their creation can be seen in file \emph{init\_test\_signals.m}\cite{inittestsignals.m}.
   
 \subsection{Procedure}
-  First we load two signals and cut them to focus at an interesting event. We've used Audacity to discover the minke whale sounds. Knowing that the first event of the sensor 1 is at 2:35 and the position of the sensors, we choose a window of signal of $2*TDOA_{max}$. $TDOA_{max}$ is the maximum possible delay between to pair of microphones, that is, $\frac{\text{distance}}{c}$, where $c$ is the speed of sound underwater. $c$ is always considered constant. Due the huge distance between sensors (many kilometers), such window is around 20-25 s. This will a problem when we run the adaptive algorithms.
+  First two signals are loaded and cut them to focus at an interesting event. We've used Audacity to discover the minke whale sounds. Knowing that the first event of the sensor 1 is at 2:35 and the position of the sensors, we choose a window of signal of $2 TDOA_{max}$. $TDOA_{max}$ is the maximum possible delay between to pair of microphones, that is, $\frac{\text{distance}}{c}$, where $c$ is the speed of sound underwater. The worst case is when the delay is computed between the furthest microphones. Such value has been computed using code in file \cite{maxdelay.m}. $c$ is always considered constant, altough better approximations could have been used, taking into consideration temperature, salinity and pressure (depth) \cite{speed-sound-seawater}. Due the huge distance between sensors (many kilometers), such window is around 20-25 s. This will a problem when we run the adaptive algorithms.
 
-  Then, after having cut the signal, we pre-processed it with a noise removal algorithm. Finally, we do the TDOA between the two signals. Knowing the true delay, we only have to do a ground truth assess. Then, we record the results as relative error and absolute error in samples. We have done the simulations with sensors 1, 2, 3, 4 and 5 with interesting results.
+  Then, after having cut the signal, we pre-processed it with a noise removal algorithm. Finally, we do the TDE between the two signals. Knowing the true delay, we only have to do a ground truth assess. Then, we record the results as relative error and absolute error in samples. We have done the simulations with sensors 1, 2, 3, 4 and 5 with interesting results.
 
 \subsection{Some events}
   Taking as a reference microphone 2, we focused on two events:
   \begin{itemize}
     \item First event: 2:20-2:45. Only noise, no other interference than the constant tone at much higher frequencies.
-    \item Second event: 8:40-9. It has interferences from other animals (dolphins and whales). For this reason, it's more critical and more important to reduce strongly the noise and interference. The results of the simulation depend heavily on the algorithms of noise reduction and TDOA used.
+    \item Second event: 8:40-9:00. It has interferences from other animals (dolphins and whales). For this reason, it's more critical and more important to reduce strongly the noise and interference. The results of the simulation depend heavily on the algorithms of noise reduction and TDOA used.
   \end{itemize}
