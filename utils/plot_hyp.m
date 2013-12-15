@@ -1,3 +1,7 @@
+% Source from Thierry Dutoit, Ferran Marquès, 
+%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
+%   Springer:New-York, 2009
+
 function plot_hyp(x1,y1,x2,y2,a,color)
 
 	% function plot_hyp(x1,y1,x2,y2,a,color) plots a hyperbola whose foci 

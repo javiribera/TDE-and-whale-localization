@@ -1,6 +1,6 @@
 function estimated_delay = delay_xcorr( input1, input2 )
-    % Estima el delay de 2 señales usando la función
-    % xcorr de MATLAB y el máximo
+    % DELAY_XCORR Estimates the delay between 2 signals
+    % using built-in MATLAB function xcorr and taking the maximum
     
     if length(input2) ~= length(input1)
         error('- ¡Both inputs must be the same length to correlate them!');

@@ -1,6 +1,7 @@
 function [estimated_delay_samples,h,e] = delay_lms(input1, input2, max_expected, length_signal, beta, handles)
-    % Estimates the delay between input1 and input2 using LMS adaptive method
-    % using the smoothing parameter provided and max_expected in samples.
+    % DELAY_LMS Estimates the delay between input1 and input2
+    % using LMS adaptive method using BETA as smoothing parameter and
+    % MAX_EXPECTED in samples.
     % It also returns the estimate of the filter h that relates both inputs
 
     global DEBUG

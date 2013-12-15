@@ -1,5 +1,5 @@
 function [ delay_secs ] = delay_between_sensors( sensorA, sensorB )
-%DELAY_BETWEEN_SENSORS Get the delay in secs between 2 sensors
+%DELAY_BETWEEN_SENSORS Gets the delay in secs between 2 sensors
 %   Given underwater sound speed of 1560 m/s, delay_between_sensors(1,2)
 %   returns the delay between sensors 1 and 2
 %   Habra que pasarlo a muestras multiplicando por la frecuencia de muestreo
