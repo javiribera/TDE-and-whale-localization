@@ -1,11 +1,11 @@
-% Source from Thierry Dutoit, Ferran Marquès, 
-%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
-%   Springer:New-York, 2009
-
 function plot_hyp(x1,y1,x2,y2,a,color)
 
-	% function plot_hyp(x1,y1,x2,y2,a,color) plots a hyperbola whose foci 
+	% PLOT_HYP(x1,y1,x2,y2,a,color) plots a hyperbola whose foci 
 	% are (x1,y1) and (x2,y2), and whose semi-major axis is 'a'
+    
+    % Source from Thierry Dutoit, Ferran Marquès, 
+    %   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
+    %   Springer:New-York, 2009
 
 	axes=axis;
 	minX=axes(1);
@@ -30,8 +30,8 @@ function plot_hyp(x1,y1,x2,y2,a,color)
 	sTheta = (y1-orgY)/c;
 	cTheta = (x1-orgX)/c;
 	invRot = [cTheta -sTheta  orgX; 
-		  sTheta  cTheta  orgY;
-		     0       0     1];
+              sTheta  cTheta  orgY;
+                 0       0     1];
 	rot = inv(invRot);
 
 	% Calculate rotated minX, minY;
