@@ -51,7 +51,7 @@ function varargout = localization(varargin)
 
 
 % --- Executes just before localization is made visible.
-function localization_OpeningFcn(hObject, eventdata, handles, varargin)
+function localization_OpeningFcn(hObject, ~, handles, varargin)
 
     % Choose default command line output for localization
     handles.output = hObject;
@@ -66,19 +66,19 @@ function localization_OpeningFcn(hObject, eventdata, handles, varargin)
 
  
 % --- Outputs from this function are returned to the command line.
-function varargout = localization_OutputFcn(hObject, eventdata, handles)
+function varargout = localization_OutputFcn(~, ~, handles)
     % Get default command line output from handles structure
     varargout{1} = handles.output;
 
 
 function localize_button_Callback(~, ~, handles)
     % get the TDEs from the GUI
-    delay12 = str2num(get(handles.delay12, 'String'));
-    delay13 = str2num(get(handles.delay13, 'String'));
-    delay14 = str2num(get(handles.delay14, 'String'));
-    delay15 = str2num(get(handles.delay15, 'String'));
-    delay16 = str2num(get(handles.delay16, 'String'));
-    delay17 = str2num(get(handles.delay17, 'String'));
+    delay = [str2num(get(handles.delay1, 'String'))
+             str2num(get(handles.delay2, 'String'))
+             str2num(get(handles.delay3, 'String'))
+             str2num(get(handles.delay4, 'String'))
+             str2num(get(handles.delay5, 'String'))
+             str2num(get(handles.delay6, 'String'))];
     % in secs.
     
     % get the speed of sound from the GUI
@@ -97,7 +97,7 @@ function localize_button_Callback(~, ~, handles)
     sensor5 = [-6163 -12402 -4600];%/1000;
     sensor6 = [-6183 -4874 -4650];%/1000;
     sensor7 = [-6129 9784 -4750];%/1000;
-    % in km.
+    % % in km.
     sensors_pos = [ sensor1;
                     sensor2;
                     sensor3;
@@ -117,31 +117,42 @@ function localize_button_Callback(~, ~, handles)
     text(sensors_pos(6,1),sensors_pos(6,2),'  6');
     text(sensors_pos(7,1),sensors_pos(7,2),'  7');
     
+    % get reference sensor from GUI
+    menu_options = cellstr(get(handles.reference_micro_menu,'String'));
+    reference = str2double(menu_options{get(handles.reference_micro_menu,'Value')});
+
     % plot beautify
-    title('TDOA. blue 1-2   red 1-3    green 1-4   yellow 1-5   black 1-6    magenta  1-7')
+    combination_sensors=[];
+    l=0;
+    for d=1:6
+        l=l+1;
+        if d==reference
+            l=l+1;
+        end
+        combination_sensors{d}=[num2str(reference), '-',num2str(l)];
+    end
+    title(['TDOA. blue ',combination_sensors{1},'   ',...
+           'red ',combination_sensors{2}, '   ',...
+           'green ', combination_sensors{3},'   ',...
+           'yellow ', combination_sensors{4},'   ',...
+           'black ', combination_sensors{5},'   ',...
+           'magenta ', combination_sensors{6}]);
     ylabel('y(m)');  xlabel('x(m)');
     axis(3*[min(sensors_pos(:,1)) max(sensors_pos(:,1)) min(sensors_pos(:,2)) max(sensors_pos(:,2))]);
 
     % plot hyperbolas of TDEs
     hold on;
-    plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
-            sensors_pos(2,1), sensors_pos(2,2), ...
-            -delay12*sound_speed/2,'b');
-    plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
-            sensors_pos(3,1), sensors_pos(3,2), ...
-            -delay13*sound_speed/2,'r');
-        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
-            sensors_pos(4,1), sensors_pos(4,2), ...
-            -delay14*sound_speed/2,'g');
-        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
-            sensors_pos(5,1), sensors_pos(5,2), ...
-            -delay15*sound_speed/2,'y');
-        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
-            sensors_pos(6,1), sensors_pos(6,2), ...
-            -delay16*sound_speed/2,'k');
-        plot_hyp(sensors_pos(1,1), sensors_pos(1,2), ...
-            sensors_pos(7,1), sensors_pos(7,2), ...
-            -delay17*sound_speed/2,'m');
+    colors={'b','r','g','y','k','m'};
+    s=0;
+    for d=1:6
+        s=s+1;
+        if d==reference
+           s=s+1;
+        end
+        plot_hyp(sensors_pos(reference,1), sensors_pos(reference,2), ...
+                sensors_pos(s,1), sensors_pos(s,2), ...
+                -delay(d)*sound_speed/2,colors{d});
+    end
     hold off;
 
 function toogle_debug_Callback(hObject, ~, ~)
@@ -166,3 +177,71 @@ function toolbar_Callback(hObject, ~, handles)
 function plot_3D_sensors_Callback(~, ~, ~)
     addpath 'utils'
     plot3Dsensors
+
+function import_file_Callback(~, ~, handles)
+    % select file and load its name and path
+    [results_FileName,results_PathName,~] = uigetfile({'*.mat','MATLAB file (*.mat)'},...
+                                                    'Select a file with results');
+    % warn filename and first parent folder
+    for i=length(results_PathName)-1:-1:1
+        if(strcmp(results_PathName(i),filesep))
+            break
+        end
+    end
+    set(handles.file_text,'String',[results_PathName(i+1:end),results_FileName]);
+
+    % import results from file
+    global T1;
+    load([results_PathName, results_FileName]);
+
+function reference_micro_menu_Callback(hObject, ~, handles)
+    menu_options = cellstr(get(hObject,'String'));
+    reference = str2double(menu_options{get(hObject,'Value')});
+    
+    % change labels in GUI
+    labels = [handles.delay1_label, handles.delay2_label, handles.delay3_label,...
+              handles.delay4_label, handles.delay5_label, handles.delay6_label ];
+    l=0;
+    for d=1:6
+        l=l+1;
+        if d==reference
+            l=l+1;
+        end
+        set(labels(d),'String', [num2str(reference), '-',num2str(l)]);
+    end
+    
+    % place delays in the GUI's textfields if not in manual case
+    global T1;
+    if ~isempty(T1)
+        event = get(handles.event_set_menu,'Value') - 1 ;
+        delay_textfields_upload(T1.event(event).delay, reference, handles)
+    end
+    
+function event_set_menu_Callback(hObject, ~, handles)
+    global T1;
+    
+    % selected event
+    event = get(hObject,'Value') - 1 ;
+    if ~strcmp(event,'Custom (manual)') && isempty(T1)
+        msgbox('Import a file with  precomputed TDEs before selecting an event',...
+            'Import a file first','warn')
+    end
+    
+    % selected reference sensor
+    references_menu_options = cellstr(get(handles.reference_micro_menu,'String'));
+    reference = str2double(references_menu_options{get(handles.reference_micro_menu,'Value')});
+    
+    % place delays in the GUI's textfields
+    delay_textfields_upload(T1.event(event).delay, reference, handles)
+    
+function delay_textfields_upload(delays, reference, handles)
+    textfields = [handles.delay1, handles.delay2, handles.delay3,...
+                  handles.delay4, handles.delay5, handles.delay6 ];
+    t=0;
+    for d=1:length(textfields)
+        t=t+1;
+        if d==reference
+            t=t+1;
+        end
+        set(textfields(d),'String', delays(reference,t).seconds)
+    end
