@@ -106,6 +106,15 @@ function localize_button_Callback(~, ~, handles)
                     sensor6;
                     sensor7;
                   ];
+              
+    % which axis to fix
+    if get(handles.fix_axis_x_option,'Value')
+        fix_axis = 'x';
+    elseif get(handles.fix_axis_y_option,'Value')
+        fix_axis = 'y';
+    elseif get(handles.fix_axis_z_option,'Value')
+        fix_axis = 'z';
+    end
           
     % plot sensors as points and label them
     plot(handles.axes_localization,sensors_pos(:,1),sensors_pos(:,2),'.');
@@ -244,4 +253,28 @@ function delay_textfields_upload(delays, reference, handles)
             t=t+1;
         end
         set(textfields(d),'String', delays(reference,t).seconds)
+    end
+
+function fix_axis_x_option_Callback(hObject, ~, handles)
+    fix_x_enabled = get(hObject,'Value');
+    if fix_x_enabled
+        set(handles.fix_axis_y_option,'Value',0);
+        set(handles.fix_axis_z_option,'Value',0);
+    end
+
+% --- Executes on button press in fix_axis_y_option.
+function fix_axis_y_option_Callback(hObject, ~, handles)
+    fix_y_enabled = get(hObject,'Value');
+    if fix_y_enabled
+        set(handles.fix_axis_x_option,'Value',0);
+        set(handles.fix_axis_z_option,'Value',0);
+    end
+
+
+% --- Executes on button press in fix_axis_z_option.
+function fix_axis_z_option_Callback(hObject, ~, handles)
+    fix_z_enabled = get(hObject,'Value');
+    if fix_z_enabled
+        set(handles.fix_axis_x_option,'Value',0);
+        set(handles.fix_axis_y_option,'Value',0);
     end
