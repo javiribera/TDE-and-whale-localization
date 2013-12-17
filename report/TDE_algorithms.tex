@@ -1,9 +1,9 @@
 In order to get a TDE, some algorithms were developed and a brief explanation of them is shown below:
 
 \subsection{Cross-correlation}
-  The cross-correlation function is very simple, so the built-in MATLAB function \emph{xcorr} was used only in this case. For a pair of finite sequences $x_1[n]$ and $x_2[k]$, the maximum of its cross-correlation function $R_{x_1[k] x_2[k]}[m]$ gives the CC TDE:
+  The cross-correlation function is very simple, so the built-in MATLAB function \emph{xcorr} was used only in this case. For a pair of finite sequences $x_1[n]$ and $x_2[k]$, the maximum of its cross-correlation function $R_{x_1[n] x_2[n]}[m]$ gives the CC TDE:
   \begin{dmath}
-    \tau = \arg\max_m R_{x_1[k] x_2[k]}[m]
+    \tau = \arg\max_m R_{x_1[n] x_2[n]}[m]
   \end{dmath}
   
   As MATLAB function \emph{xcorr} returns the result shifted so all values are at positive indexes, the TDE is the difference in samples from the maximum to the middle of the sequence.
@@ -14,21 +14,21 @@ In order to get a TDE, some algorithms were developed and a brief explanation of
 \subsection{Generalized cross-correlation}
 The generalized cross-correlation (GCC) is a generalization of the cross-correlation in the frequency domain. It is computed as follows:
 \begin{dmath}
-  R_{GCC_{x_1[k] x_2[k]}}[m] = \text{IFFT}_M\{\Phi[k]S_{x_1x_2}[k]\}[m]
+  R_{GCC_{x_1[n] x_2[n]}}[m] = \text{IFFT}_M\{\Phi[k]S_{x_1x_2}[k]\}[m]
 \end{dmath}
 
-Where $S_{x_1x_2}$ is the cross-spectrum of the input signals, and for a finite-length sequence it should be approximated as $E\{X_1[k]X^*_2[k]\} $, where $X_j[k]$ denotes the discrete Fourier transform (DFT) of the input signal $x_j[n]$ and $(\cdotp)^*$ the complex conjugate operator.
+Where $S_{x_1x_2}$ is the cross-spectrum of the input signals given by $E\{X_1[k]X^*_2[k]\} $, but for a finite-length sequence it is approximated as $X_1[k]X^*_2[k]$, where $X_j[k]$ denotes the discrete Fourier transform (DFT) of the input signal $x_j[n]$ and $(\cdotp)^*$ the complex conjugate operator.
 
-The function $\Phi[k]$ is the weighting filter. Depending of the chosen weighting filter, the GCC behaves diferent. As seen, the idea is to compute a cross-correlation with some frequency filtering. The weighting filter $\Phi[k]=1$ returns the classical cross-correlation.
+The function $\Phi[k]$ is the weighting filter. Depending of the chosen weighting filter, the GCC behaves diferent. As seen, the idea is to compute a cross-correlation with some frequency filtering. With the weighting filter $\Phi[k]=1$, GCC returns the classical cross-correlation.
 
 The two implemented weighting filters have been Phase Transform (GCC-PHAT) and Smoothed Coherence Transform (GCC-SCOT). The former makes use of only the phase of the signals by using as a weighting filter $\Phi_{\text{PHAT}}[k]=\frac{1}{|S_{x_1x_2}[k]|}$. This method, though, has not yield good results in this case-study. The latter, GCC-SCOT, uses $\Phi_{\text{SCOT}}[k]=\frac{1}{\sqrt{X_1[k]X^*_2[k]}}$. The SCOT method returned much better results than PHAT. Their MATLAB implementations are in the file \emph{gcc.m}\cite{gcc.m}.
 
-The TDE with GCC is computed the same way as in the classical CC: taking the maximum value, as can bee seen in file \emph{delay\_gcc.m}\cite{delaygcc.m}.
+The TDE with GCC is computed the same way as in the classical CC: taking the maximum value, as can bee seen in the file \emph{delay\_gcc.m}\cite{delaygcc.m}.
 
 \subsection{Least Mean Squares}
-The idea of the Least Mean Squares method is to try to synthesize a FIR filter that would represent the channel response between a pair of signals. Without taking into consideration the nonideality of the channel, the TDE would be computed as the maximum lag of such estimated filter. It is built by adaptively trying to minimize the Mean Squared Error (MSE) $E\{|e[n]|^2\}$ between one input signal and the output of the filter, whose input is the other signal. Figure \ref{fig:LMS} shows the overall scheme. As we have a finite-length sequence available, the MSE is approximated as the instantaneous squared of the error, $|e[n]|^2$. Minimizing $|e[n]|^2$ with respect to the filter yields to the expression
+The idea of the Least Mean Squares method is to try to synthesize a FIR filter that would represent the channel response between a pair of signals. Without taking into consideration the nonideality of the channel, the TDE would be computed as the maximum lag of such estimated filter. It is built by adaptively trying to minimize the Mean Squared Error (MSE) $E\{|\vect{e}[n]|^2\}$ between one input signal and the output of the filter, whose input is the other signal. Figure \ref{fig:LMS} shows the overall scheme. As we have a finite-length sequence available, the MSE is approximated as the instantaneous squared of the error, $|e[n]|^2$. Minimizing $|\vect{e}[n]|^2$ with respect to the filter yields to the expression
 \begin{dmath}
-  h'[n+1] = h[n] + 2 \mu e[n] x_1[n]
+  h'[n+1] = h[n] + 2 \mu \vect{e}[n] \vect{x_1}[n]
 \end{dmath}
 where $\mu$ is the stepsize of the algorithm, which determines the speed of the convergence to a null error (in mean), but also the stability of the filter. It can be shown that an upper stability bound is $\frac{2}{\lambda_{max}}$, where $\lambda_{max}$ is the maximum eigenvalue of the cross-correlation function between both signals. Instead of using a value near this bound, an adaptive solution for the stepsize $\mu$ has been used. This solution depends on the input power and $\beta$, a smoothing parameter. However, this should not be a problem if we use Time Gain Normalization preconditioning.
 \begin{dmath}
