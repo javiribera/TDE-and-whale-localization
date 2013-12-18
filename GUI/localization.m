@@ -63,6 +63,7 @@ function localization_OpeningFcn(hObject, ~, handles, varargin)
     % uiwait(handles.figure1);
     
     addpath('utils');
+    clear all; clc
 
  
 % --- Outputs from this function are returned to the command line.
@@ -117,14 +118,23 @@ function localize_button_Callback(~, ~, handles)
     end
           
     % plot sensors as points and label them
-    plot(handles.axes_localization,sensors_pos(:,1),sensors_pos(:,2),'.');
-    text(sensors_pos(1,1),sensors_pos(1,2),'  1');
-    text(sensors_pos(2,1),sensors_pos(2,2),'  2');
-    text(sensors_pos(3,1),sensors_pos(3,2),'  3');
-    text(sensors_pos(4,1),sensors_pos(4,2),'  4');
-    text(sensors_pos(5,1),sensors_pos(5,2),'  5');
-    text(sensors_pos(6,1),sensors_pos(6,2),'  6');
-    text(sensors_pos(7,1),sensors_pos(7,2),'  7');
+    switch fix_axis
+        case 'x'
+            plot(handles.axes_localization,sensors_pos(:,2),sensors_pos(:,3),'.');
+            for i=1:7
+                text(sensors_pos(i,2),sensors_pos(i,3),['  ',num2str(i)]);
+            end
+        case 'y'
+            plot(handles.axes_localization,sensors_pos(:,1),sensors_pos(:,3),'.');
+            for i=1:7
+                text(sensors_pos(i,1),sensors_pos(i,3),['  ',num2str(i)]);
+            end
+        case 'z'
+            plot(handles.axes_localization,sensors_pos(:,1),sensors_pos(:,2),'.');
+            for i=1:7
+                text(sensors_pos(i,1),sensors_pos(i,2),['  ',num2str(i)]);
+            end
+    end
     
     % get reference sensor from GUI
     menu_options = cellstr(get(handles.reference_micro_menu,'String'));
@@ -141,13 +151,24 @@ function localize_button_Callback(~, ~, handles)
         combination_sensors{d}=[num2str(reference), '-',num2str(l)];
     end
     title(['TDOA. blue ',combination_sensors{1},'   ',...
-           'red ',combination_sensors{2}, '   ',...
-           'green ', combination_sensors{3},'   ',...
-           'yellow ', combination_sensors{4},'   ',...
-           'black ', combination_sensors{5},'   ',...
-           'magenta ', combination_sensors{6}]);
-    ylabel('y(m)');  xlabel('x(m)');
-    axis(3*[min(sensors_pos(:,1)) max(sensors_pos(:,1)) min(sensors_pos(:,2)) max(sensors_pos(:,2))]);
+           'red ',      combination_sensors{2}, '   ',...
+           'green ',    combination_sensors{3},'   ',...
+           'yellow ',   combination_sensors{4},'   ',...
+           'black ',    combination_sensors{5},'   ',...
+           'magenta ',  combination_sensors{6}]);
+    switch fix_axis
+        case 'x'
+            xlabel('y(m)'); ylabel('z(m)');
+            axis([-15000 15000 -15000 15000]);
+        case 'y'
+            xlabel('x(m)'); ylabel('z(m)');
+            %axis([min(sensors_pos(:,1)) max(sensors_pos(:,1)) min(sensors_pos(:,3)) max(sensors_pos(:,3))]);
+            axis([-15000 15000 -15000 15000]);
+        case 'z'
+            xlabel('x(m)'); ylabel('y(m)');
+            axis(3*[min(sensors_pos(:,1)) max(sensors_pos(:,1)) min(sensors_pos(:,2)) max(sensors_pos(:,2))]);
+    end
+    %return
 
     % plot hyperbolas of TDEs
     hold on;
@@ -158,9 +179,20 @@ function localize_button_Callback(~, ~, handles)
         if d==reference
            s=s+1;
         end
-        plot_hyp(sensors_pos(reference,1), sensors_pos(reference,2), ...
-                sensors_pos(s,1), sensors_pos(s,2), ...
-                -delay(d)*sound_speed/2,colors{d});
+        switch fix_axis
+            case 'x'
+                plot_hyp(sensors_pos(reference,2), sensors_pos(reference,3), ...
+                        sensors_pos(s,2), sensors_pos(s,3), ...
+                        -delay(d)*sound_speed/2,colors{d});
+            case 'y'
+                plot_hyp(sensors_pos(reference,1), sensors_pos(reference,3), ...
+                        sensors_pos(s,1), sensors_pos(s,3), ...
+                        -delay(d)*sound_speed/2,colors{d});
+            case 'z'
+                plot_hyp(sensors_pos(reference,1), sensors_pos(reference,2), ...
+                        sensors_pos(s,1), sensors_pos(s,2), ...
+                        -delay(d)*sound_speed/2,colors{d});
+        end
     end
     hold off;
 
@@ -260,21 +292,24 @@ function fix_axis_x_option_Callback(hObject, ~, handles)
     if fix_x_enabled
         set(handles.fix_axis_y_option,'Value',0);
         set(handles.fix_axis_z_option,'Value',0);
+    else
+        set(hObject,'Value',1);
     end
 
-% --- Executes on button press in fix_axis_y_option.
 function fix_axis_y_option_Callback(hObject, ~, handles)
     fix_y_enabled = get(hObject,'Value');
     if fix_y_enabled
         set(handles.fix_axis_x_option,'Value',0);
         set(handles.fix_axis_z_option,'Value',0);
+    else
+        set(hObject,'Value',1);
     end
 
-
-% --- Executes on button press in fix_axis_z_option.
 function fix_axis_z_option_Callback(hObject, ~, handles)
     fix_z_enabled = get(hObject,'Value');
     if fix_z_enabled
         set(handles.fix_axis_x_option,'Value',0);
         set(handles.fix_axis_y_option,'Value',0);
+    else
+        set(hObject,'Value',1);
     end
