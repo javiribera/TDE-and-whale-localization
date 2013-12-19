@@ -261,19 +261,24 @@ function reference_micro_menu_Callback(hObject, ~, handles)
 function event_set_menu_Callback(hObject, ~, handles)
     global T1;
     
-    % selected event
-    event = get(hObject,'Value') - 1 ;
-    if ~strcmp(event,'Custom (manual)') && isempty(T1)
-        msgbox('Import a file with  precomputed TDEs before selecting an event',...
-            'Import a file first','warn')
-    end
-    
     % selected reference sensor
     references_menu_options = cellstr(get(handles.reference_micro_menu,'String'));
     reference = str2double(references_menu_options{get(handles.reference_micro_menu,'Value')});
     
-    % place delays in the GUI's textfields
-    delay_textfields_upload(T1.event(event).delay, reference, handles)
+    % selected event
+    event = get(hObject,'Value') - 1 ;
+    
+    if event == 0 % custom (no event)
+        % empty GUI's textfields
+        set(handles.delay1,'String',''); set(handles.delay2,'String','');
+        set(handles.delay3,'String',''); set(handles.delay4,'String','');
+        set(handles.delay5,'String',''); set(handles.delay6,'String','');
+    elseif isempty(T1)
+        msgbox('Import a file with  precomputed TDEs before selecting an event',...
+            'Import a file first','warn')
+    else % place delay in GUI's textfields
+        delay_textfields_upload(T1.event(event).delay, reference, handles)
+    end
     
 function delay_textfields_upload(delays, reference, handles)
     textfields = [handles.delay1, handles.delay2, handles.delay3,...
