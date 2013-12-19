@@ -129,6 +129,10 @@ function visualize_plot_button_Callback(~, ~, handles)
     % warn user starting
     set(handles.plotting, 'String', 'Plotting...')
     set(handles.plotting, 'Visible', 'on')
+    set(get(0,'CurrentFigure'),'CurrentAxes',handles.axes_data1)
+    cla; text(0.4,0.5,'In progress...')
+    set(get(0,'CurrentFigure'),'CurrentAxes',handles.axes_data2)
+    cla; text(0.4,0.5,'In progress...')
     drawnow
 
     options = cellstr(get(handles.plot_options,'String'));
@@ -158,8 +162,15 @@ function visualize_plot_button_Callback(~, ~, handles)
     set(handles.plotting, 'String', 'Plotted')
 
 function tdoa_plot_button_Callback(~, ~, handles)
-    set(handles.working_go,'String','Working...'); drawnow;
+    % warn user starting
+    set(handles.working_go,'String','Working...')
+    set(get(0,'CurrentFigure'),'CurrentAxes',handles.axes_tdoa)
+    cla; text(0.4,0.5,'In progress...')
+    drawnow
+    
     tdoa(handles,'in_guide');
+    
+    % warn user work done
     set(handles.working_go,'String','Done :)');
 
 function plot_tdoa_separate_window_Callback(~, ~, handles)
@@ -277,6 +288,8 @@ function tdoa(handles,where)
     set(handles.error_samples, 'String', [num2str(delay_error_samples), ' samples']);
     delay_error_relative = 100*(delay_error_samples/true_delay_samples);
     set(handles.error_percentatge, 'String', [num2str(delay_error_relative), '%']);
+    
+    drawnow
 
 function play_sound_1_Callback(~, ~, ~)
     global data1_player;
