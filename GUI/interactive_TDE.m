@@ -138,13 +138,16 @@ function visualize_plot_button_Callback(~, ~, handles)
             plot(handles.axes_data1,data1);
             plot(handles.axes_data2,data2);
         case 'Spectrogram'
-            [S,F,T,P] = spectrogram(data1,256,250,256,Fs);
+            N=str2double(get(handles.points_dft,'String'));
+            win_length=str2double(get(handles.win_length,'String'));
+            
+            [S,F,T,P] = spectrogram(data1,win_length,floor(250/256)*N,N,Fs);
             surf(handles.axes_data1,T,F/1000,10*log10(P),'edgecolor','none'); 
             view(handles.axes_data1,0,90);
             ylabel('KHz'); axis tight
             drawnow
                         
-            [S,F,T,P] = spectrogram(data2,256,250,256,Fs);
+            [S,F,T,P] = spectrogram(data1,win_length,floor(250/256)*N,N,Fs);
             surf(handles.axes_data2,T,F/1000,10*log10(P),'edgecolor','none');
             view(handles.axes_data2,0,90);
             ylabel('KHz'); axis tight
@@ -393,4 +396,19 @@ function toolbar_Callback(hObject, ~, handles)
         set(hObject,'Label', 'Show Toolbar')
         set(handles.figure1,'Toolbar','none')
     end
-        
+
+function plot_options_Callback(hObject, eventdata, handles)
+    % show 'DFT points' option when spectrogram is selected
+    menu_options = cellstr(get(hObject,'String'));
+    selected_option = menu_options{get(hObject,'Value')};
+    if strcmp(selected_option ,'Spectrogram')
+        set(handles.points_dft_text,'Visible','on')
+        set(handles.points_dft,'Visible','on')
+        set(handles.win_length,'Visible','on')
+        set(handles.win_length_text,'Visible','on')
+    else
+        set(handles.points_dft_text,'Visible','off')
+        set(handles.points_dft,'Visible','off')
+        set(handles.win_length_text,'Visible','off')
+        set(handles.win_length,'Visible','off')
+    end
