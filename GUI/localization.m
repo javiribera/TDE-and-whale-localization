@@ -1,27 +1,6 @@
 function varargout = localization(varargin)
-    % LOCALIZATION MATLAB code for localization.fig
-    %      LOCALIZATION, by itself, creates a new LOCALIZATION or raises the existing
-    %      singleton*.
-    %
-    %      H = LOCALIZATION returns the handle to a new LOCALIZATION or the handle to
-    %      the existing singleton*.
-    %
     %      LOCALIZATION('CALLBACK',hObject,eventData,handles,...) calls the local
     %      function named CALLBACK in LOCALIZATION.M with the given input arguments.
-    %
-    %      LOCALIZATION('Property','Value',...) creates a new LOCALIZATION or raises the
-    %      existing singleton*.  Starting from the left, property value pairs are
-    %      applied to the GUI before localization_OpeningFcn gets called.  An
-    %      unrecognized property name or invalid value makes property application
-    %      stop.  All inputs are passed to localization_OpeningFcn via varargin.
-    %
-    %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-    %      instance to run (singleton)".
-    %
-    % See also: GUIDE, GUIDATA, GUIHANDLES
-
-    % Edit the above text to modify the response to help localization
-
     
     % Change always to root folder
     currentpath=pwd;
