@@ -226,7 +226,7 @@ function tdoa(handles,where)
     switch method_selected
         case 'Cross-correlation (xcorr)'
             % warn label
-            set(handles.plot_label, 'String', 'GCC Scot result')
+            set(handles.plot_label, 'String', 'CC (xcorr) result')
             set(handles.plot_label, 'Visible', 'on')
             
             delay_samples = delay_xcorr(preprocessed_signal1,preprocessed_signal2);
