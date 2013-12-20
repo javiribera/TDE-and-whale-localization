@@ -425,3 +425,7 @@ function plot_options_Callback(hObject, eventdata, handles)
         set(handles.win_length_text,'Visible','off')
         set(handles.win_length,'Visible','off')
     end
+
+function go_to_main_menu_Callback(~, ~, ~) 
+    close
+    main

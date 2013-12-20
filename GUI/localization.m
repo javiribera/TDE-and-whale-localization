@@ -284,3 +284,7 @@ function fix_axis_z_option_Callback(hObject, ~, handles)
     else
         set(hObject,'Value',1);
     end
+    
+function go_to_main_menu_Callback(~, ~, ~) 
+    close
+    main
