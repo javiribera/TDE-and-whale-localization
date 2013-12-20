@@ -1,4 +1,4 @@
-addpath 'test_signals'
+addpath 'test_signals' 'algorithms_TDE'
 init_test_signals()
 load 'test_signals/test_signals.mat';
 DEBUG=1

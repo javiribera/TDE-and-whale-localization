@@ -223,6 +223,7 @@ function tdoa(handles,where)
     end
     
     % compute tdoa by selection
+    addpath 'algorithms_TDE'
     switch method_selected
         case 'Cross-correlation (xcorr)'
             % warn label
