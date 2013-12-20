@@ -1,6 +1,6 @@
-Prior to the delay detection, it is not only useful, but also necessary, to preprocess the filter in some way. Usually, TDE block gets confused by noise, reflections and variance in the power throughout time. Each preconditioning method tries to solve some of these problems.
+Prior to the delay detection, it is not only useful, but also necessary, to preprocess the filter in some way. Usually, TDE block gets confused by noise, reflections and variance in the power throughout time. Each preconditioning method tries to solve some of these inconvenience.
 \subsection{Time Gain Normalization}
-  Time Gain Normalization algorithm tries to fit the average amplitude to a fixed level, by calculating the long-term average level $\overline{x}[n]$ using a smoothing time averaging parameter $\alpha$ and a $L^P$ norm the following way:
+  Time Gain Normalization algorithm tries to fit the average amplitude to a fixed level, by calculating the long-term average level $\overline{x}[n]$ using a smoothing time averaging parameter $\alpha$ and a $L^P$ norm in the following way:
   \begin{dmath}
     \overline{x}[n] = (\alpha \overline{x}^P[n-1] + (1-\alpha) |\overline{x}[n]|^P ) ^{\frac{1}{P}}
   \end{dmath}
@@ -27,21 +27,21 @@ Prior to the delay detection, it is not only useful, but also necessary, to prep
     \end{array} \right.
   \end{dmath}
   
-  Where $X$ is the spectrum of the clean signal, $Y$ is the noisy signal, $N$ is the estimated noise spectrum, $\alpha$ is the oversubtraction parameter and $\beta$ is the spectral floor.
+  Where $X[k]$ is the spectrum of the clean signal, $Y[k]$ is the noisy signal, $N[k]$ is the estimated noise spectrum, $\alpha$ is the oversubtraction parameter and $\beta$ is the spectral floor.
   
-  The implementation of Spectral Substraction can be seen in file \emph{spectralsubstraction.m}\cite{spectralsubstraction.m}.
+  The implementation of Spectral Substraction can be seen in the file \emph{spectralsubstraction.m}\cite{spectralsubstraction.m}.
 
 \subsection{Percentile Noise Removal}
   Percentile Noise Removal (PNR) is a method for restoration of the power spectrum through substraction of an estimate of the percentile nth of the noise spectrum from the noisy signal spectrum. The noise spectrum is usually estimated like in the spectral subtraction method. Then, we apply the percentile function to this noise spectrum. All of this steps are updated from the periods when the signal is absent and only the noise is present. Finally, we subtract the product of the percentile estimation with a constant to the Spectrogram of the signal. The chosen value in many of our simulations was 5 after trial and error.
 
   We did the assumption that the noise is a stationary or a slowly varying process, and that the noise spectrum does not change significantly between the update periods. The magnitude and power spectrum are non-negative variables, and any negative estimates of these variables should be mapped into 0. 
 
-  To proposed percentile value is 90. It has been elected because it is the optimum value in our case, where the curve of spectrogram-percentile is flattest. Note that if we take nth=50, the Percentile Noise Removal is very similar to Spectral Subtraction, since the nth=50 means to take the median of the estimated noise spectrum and the Spectral Subtraction uses the average of the noise spectrum.
+  The proposed percentile value is 90. It has been elected because it is the optimum value in our case, where the curve of spectrogram-percentile is flattest. Note that if we take nth=50, the Percentile Noise Removal is very similar to Spectral Subtraction, since the nth=50 means taking the median of the estimated noise spectrum and the Spectral Subtraction uses the average of the noise spectrum.
   
   The PNR algorithm is comptued as follows:
   \begin{dmath}
-    S(t,f)'= max\{S(t,f)- c N,0\}
+    S'(t,f)= max\{S(t,f)- c N,0\}
   \end{dmath}
-  where $S(t,f)'$ is the spectrogram of the clean signal, $S(t,f)$ is the spectrogram of the noisy signal, $c$ is the oversubtraction parameter and N is the chosen percentile of the estimated noise spectrogram.
+  where $S'(t,f)$ is the spectrogram of the clean signal, $S(t,f)$ is the spectrogram of the noisy signal, $c$ is the oversubtraction parameter and $N$ is the chosen percentile of the estimated noise spectrogram.
   
-  The implementation of Percentile Noise Removal can be seen in file \emph{percentile.m}\cite{percentile.m}.
+  The implementation of Percentile Noise Removal can be seen in the file \emph{percentile.m}\cite{percentile.m}.

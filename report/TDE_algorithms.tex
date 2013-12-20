@@ -28,22 +28,24 @@ The TDE with GCC is computed the same way as in the classical CC: taking the max
 \subsection{Least Mean Squares}
 The idea of the Least Mean Squares method is to try to synthesize a FIR filter that would represent the channel response between a pair of signals. Without taking into consideration the nonideality of the channel, the TDE would be computed as the maximum lag of such estimated filter. It is built by adaptively trying to minimize the Mean Squared Error (MSE) $E\{|\vect{e}[n]|^2\}$ between one input signal and the output of the filter, whose input is the other signal. Figure \ref{fig:LMS} shows the overall scheme. As we have a finite-length sequence available, the MSE is approximated as the instantaneous squared of the error, $|e[n]|^2$. Minimizing $|\vect{e}[n]|^2$ with respect to the filter yields to the expression
 \begin{dmath}
-  h'[n+1] = h[n] + 2 \mu \vect{e}[n] \vect{x_1}[n]
+  \vect{h'}[n+1] = \vect{h}[n] + 2 \mu \vect{e}[n] \vect{x_1}[n]
 \end{dmath}
-where $\mu$ is the stepsize of the algorithm, which determines the speed of the convergence to a null error (in mean), but also the stability of the filter. It can be shown that an upper stability bound is $\frac{2}{\lambda_{max}}$, where $\lambda_{max}$ is the maximum eigenvalue of the cross-correlation function between both signals. Instead of using a value near this bound, an adaptive solution for the stepsize $\mu$ has been used. This solution depends on the input power and $\beta$, a smoothing parameter. However, this should not be a problem if we use Time Gain Normalization preconditioning.
+where $\mu$ is the stepsize of the algorithm, which determines the speed of the convergence to a null error (in mean), but also the stability of the filter. It can be shown that an upper stability bound is $\frac{2}{\lambda_{max}}$, where $\lambda_{max}$ is the maximum eigenvalue of the cross-correlation function between both signals. Instead of using a value near this bound, an adaptive solution for the stepsize $\mu$ has been used. This solution depends on the input power and $\beta$, a smoothing parameter. However, this should not be a problem if we use Time Gain Normalization preconditioning. The smoothing parameter is updated at each time instant as
 \begin{dmath}
   \mu[n] = \frac{1-\beta}{\sigma^2[n]}
 \end{dmath}
+
+The instantaneous input power is estimated as
 \begin{dmath}
   \sigma^2[n] = \beta \sigma^2[n-1] + (1-\beta)|x_2[n]|^2
 \end{dmath}
 
 In addition, at each step the filter is normalized to an unitary filter to avoid numerical instability:
 \begin{dmath}
-  h[n] = \frac{h'[n]}{||h'[n]||}
+  \vect{h}[n] = \frac{\vect{h'}[n]}{||\vect{h'}[n]||}
 \end{dmath}
 
-The overall code can be seen in file \emph{delay\_lms.m}\cite{delaylms.m}.
+The overall code can be seen in the file \emph{delay\_lms.m}\cite{delaylms.m}.
 
 \begin{figure}[htb]
 	\begin{center}
@@ -55,7 +57,7 @@ The overall code can be seen in file \emph{delay\_lms.m}\cite{delaylms.m}.
 
 
 \subsection{Adaptive Eigenvalue Decomposition}
-Adaptive eigenvalue decomposition (AED) algorithm was proposed to deal with TDE in reverberant environments. Unlike the crosscorrelation stated above, this algorithm first identifies the channel impulse responses from the source to the two sensors. The delay estimate is then determined by finding the direct paths from the two measured impulse responses. To do that, we observe that
+Adaptive eigenvalue decomposition (AED) algorithm was proposed to deal with TDE in reverberant environments. Unlike the crosscorrelation stated above, this algorithm first identifies the channel impulse responses from the source to the two sensors. The delay estimate is then determined by finding the direct paths from the two measured impulse responses. To do so, we observe that
 \begin{dmath}
   x_2[k] * g_1 = s[k] * g_2 * g_1 = x_1[k] * g_2
 \end{dmath}
@@ -66,13 +68,16 @@ Adaptive eigenvalue decomposition (AED) algorithm was proposed to deal with TDE 
   \item The covariance matrix $R$ is full rank.
 \end{itemize}
 
-  In case of noise, the covariance matrix will regularize. That will provoke that the algorithm stated above become inoperable because the lack of a 0 eigenvalue. To solve that we have implement this adaptive algorithm that calculate the eigenvector with minimum eigenvalue:
+  In case of noise, the covariance matrix will regularize. That will provoke that the algorithm stated above become inoperable because the lack of a 0 eigenvalue. To solve that we have implemented an adaptive way to calculate the eigenvector with minimum eigenvalue:
  \begin{dmath}
     u[k+1] = \frac{u[k] - \mu e[k] x[k]}{||u[k]||}
  \end{dmath}
  where $\mu$ is the positive adaptation step.
  
 
-  With the identified impulse responses $g_1$ and $g_2$, the time delay estimate is determined as the difference between two direct paths. That is $T_{\text{AED}} = \arg\max_T |g_2|-|g_1|$. 
+  With the identified impulse responses $g_1$ and $g_2$, the time delay estimate is determined as the difference between two direct paths. That is,
+  \begin{dmath}
+    T_{\text{AED}} = \arg\max_T |g_2|-|g_1|
+  \end{dmath}
 
   Finally, the noise will not be a problem with the time delay estimation because we only want to find the two direct path and not the whole impulse response. Then, AED is the best of the stated algorithms in front of noise and reverberation. 
