@@ -1,6 +1,3 @@
-% Original Source from Thierry Dutoit, Ferran Marquès, 
-%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
-%   Springer:New-York, 2009
 
 function [zc]=gcc(z1, z2, flag)
 
@@ -14,6 +11,10 @@ function [zc]=gcc(z1, z2, flag)
 %
 % C. H. Knapp and G.C. Carter, "The Generalized Correlation Method for
 % Estimation of Time Delay", IEEE, Trans. on ASSP, No4(24), Aug. 1976
+
+% Original Source from Thierry Dutoit, Ferran Marquès, 
+%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
+%   Springer:New-York, 2009
 
 % make sure we work with rows
 z1 =z1(:)';
@@ -44,7 +45,7 @@ elseif(strcmp(flag,'scot'))
     W = 1./( (Z1.*Z2).^0.5 );
     phi_z1z2 = ifft(Phi_z1z2 .* W);
     zc = [phi_z1z2(NFFT-M+2:NFFT) phi_z1z2(1:M)];  % re-arrange the vector  
-        
+
 else
    disp('Invalid value for flag');
 end

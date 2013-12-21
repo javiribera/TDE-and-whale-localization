@@ -1,14 +1,18 @@
 function output = spectralsubstraction(input,signal_substraction_params)
 
-  %% SPECTRAL SUBSTRACTION
-  
-    % assure input vectors to be columns
-    input = input(:);
-    
-  global Fs;
-  alpha = signal_substraction_params.alpha;
-  beta = signal_substraction_params.beta;
-  gamma=2; % Exponent of magnitude spectrum
+%% SPECTRAL SUBSTRACTION
+
+% Original Source from Thierry Dutoit, Ferran Marquès, 
+%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
+%   Springer:New-York, 2009
+
+% assure input vectors to be columns
+input = input(:);
+
+global Fs;
+alpha = signal_substraction_params.alpha;
+beta = signal_substraction_params.beta;
+gamma=2; % Exponent of magnitude spectrum
 frameShiftDuration=10; % in ms
 frameDuration=20; % in ms
 initialNoiseDuration=1000; 

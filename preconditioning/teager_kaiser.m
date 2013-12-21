@@ -3,6 +3,10 @@ function y = teager_kaiser(x)
 % y = teager_kaiser(x) applies the Teager-Kaiser energy operator to
 % input signal x.
 
+% Source from Thierry Dutoit, Ferran Marquès, 
+%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
+%   Springer:New-York, 2009
+
 x=x(:); % Setting x as a column vector
 
 L = length(x);
