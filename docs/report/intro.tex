@@ -42,15 +42,30 @@
   \end{itemize}
   \vspace{5pt}
   
-  In addition, a handy straight-forward GUI has been built in order to rapidly compare the algorithms and assess its pros and cons on each kind of signal. Such GUI allows to visually:
+  In addition, two handy straight-forward GUIs haven been built in order to rapidly compare the algorithms and assess its pros and cons on each kind of signal.
+  
+  The first GUI, named "Minke whales sounds TDE" \cite{interactiveTDE.m} allows to visually:
   \begin{itemize}
     \item Import a pair of raw \textit{.wav} signals
     \item Select a time segment of this signals in minutes and seconds
     \item Plot their time evolution or spectrogram
     \item Apply any combination of the preprocessing methods
+    \item Visualize the frequency and phase response of the pass-band filter
     \item Choose the desired TDE algorithms to assess
     \item Plot the resulting (G)CC or in case of LMS, the estimated filter or its error
     \item Compute the absolute or relative TDE error in both samples and seconds
     \item Visualize the 3D disposition of the underwater sensors
+  \end{itemize}
+  \vspace{5pt}
+  
+  The second GUI, named "Localization" \cite{localization.m} allows to visually:
+  \begin{itemize}
+    \item Import precomputed delays from a \emph{.mat} file
+    \item Switch between the recorded events inside this file
+    \item Select one of the seven microphones as reference
+    \item Load the delays from the imported file regarding event and reference selected, or insert custom delays
+    \item Fix the desired speed of sound
+    \item Choose the desired TDE algorithms to assess
+    \item Plot the TDOA hyperbolas for all the microphones
   \end{itemize}
   \vspace{5pt}

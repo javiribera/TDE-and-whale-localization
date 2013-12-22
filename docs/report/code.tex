@@ -1,1 +1,37 @@
 All the code of the project is publicy available in a git repository on Bitbucket within the next URL: \url{https://bitbucket.org/javiribera/dsap/src}
+A brief high-level explanation of some files is done below:
+\newpage
+
+\begin{itemize}
+  \item \emph{algorithms\_TDE} folder
+    \begin{itemize}
+      \item \emph{gcc.m} \cite{gcc.m} computes the Generalized Cross-Correlation between parameter 1 and 2 using the weighting algorithm passed as third parameter ("cc","phat" or "scot").
+      \item \emph{delay\_gcc.m} \cite{delaygcc.m} bypasses its parameters to \emph{gcc.m} and takes the last maximum index value.
+      \item \emph{delay\_xcorr.m} \cite{delayxcorr.m} computes the classical cross-correlation and also takes the last maximum index value.
+      \item \emph{delay\_lms.m} \cite{delaylms.m} returns the delay between first and second parameter using LMS adaptive method using the fifth parameter (beta) as smoothing parameter. The third (max\_expected) and forth (length\_signal) parameters are used to know the minimum order or the filter. The last parameter (handles) is used only to be able to plot the results to the GUI.
+    \end{itemize}
+    
+  \item \emph{preconditioning} folder
+    \begin{itemize}
+      \item \emph{build\_filter.m} \cite{buildfilter.m} returns a very high-order (50) filter designed to bandpass filter minke whale sounds (1 and \SI{12}{\kilo\Hz}).
+      \item \emph{filter\_passband.m} \cite{filterpassband.m} outputs the input after being filtered by the filter returned by \emph{build\_filter.m}.
+      \item \emph{percentile.m} \cite{percentile.m} outputs the input after being processed by the percentile noise removal algorithm.
+      \item \emph{spectralsubstraction.m} \cite{spectralsubstraction.m} outputs the input processed by the spectral substraction algorithm.
+      \item \emph{time\_gain.m} \cite{timegain.m} outputs the input after being processed by the Time Gain Normalization algorithm.
+    \end{itemize}
+    
+  \item \emph{GUI} folder
+    \begin{itemize}
+      \item \emph{main\_GUI.m} \cite{mainGUI.m} is a simple 2-button GUI to choose between the next 2 GUI:
+      \item \emph{interactive\_TDE.m} \cite{interactiveTDE.m} displays the GUI shown at Figure \ref{fig:GUI} that has all the capabilities explained at Introduction, section B, "Scope of the project".
+      \item \emph{localization.m} \cite{localization.m} displays the GUI shown at Figure \ref{fig:hyp} that has all the capabilities explained at Introduction, section B, "Scope of the project".
+    \end{itemize}
+    
+  \item \emph{clean\_signal.m} \cite{cleansignal.m} accepts as the second parameter ("preprocessing\_methods") a string cell array containing the names of the preconditioning methods to be applied to the signal in the first parameter ("input"). Available options are:
+"remove\_mean", "band\_pass", "time\_gain", "spectral\_substraction", "percentile" and "tk". It applies the selected method in a hardcoded order and outputs the clean signal.
+    
+  \item \emph{clean\_signal.m} \cite{cleansignal.m} is a script to create the 7x3 matrix containing the [X,Y,Z] position of the hydrophones in meters.
+    
+  \item \emph{test\_signals/init\_test\_signals.m} \cite{inittestsignals.m} is a script that creates three pairs of artificial signals (two tones, two chirps and 2 random noise signals) identical but delayed a known number of seconds, given a sample frequency. It then saves them inside folder \emph{test\_signals}as a \emph{.mat} file and as \emph{.wav} files.
+    
+\end{itemize}
