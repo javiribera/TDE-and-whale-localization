@@ -6,12 +6,14 @@ function output = spectralsubstraction(input,signal_substraction_params)
 %   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
 %   Springer:New-York, 2009
 
+
 % assure input vectors to be columns
 input = input(:);
 
 global Fs;
 alpha = signal_substraction_params.alpha;
 beta = signal_substraction_params.beta;
+
 gamma=2; % Exponent of magnitude spectrum
 frameShiftDuration=10; % in ms
 frameDuration=20; % in ms
@@ -47,11 +49,6 @@ for k=1:numNoiseFrames
 end
 
 
-% figure(2); plot(NoiseSpec(1:frameLength/2+1));
-
-% Working frame-by-frame, subtract the noise spectrum estimate from the 
-% noisy speech spectrum, with the usual spectral subtraction equations. 
-
 
 ProcessedSignal=zeros(fileLength,1);
 
@@ -64,11 +61,7 @@ for k=1:(numOfFrames-1)
    FrameSpec=((abs(FrameFFT)).^gamma)*(1/frameLength); % Frame periodogram
    FramePhase=angle(FrameFFT); % Save the phase function
    
-% ********************************************
-% Implement the spectral subtraction equations
-% ********************************************
- 
-      FrameSpec=max(FrameSpec-alpha*NoiseSpec,beta*FrameSpec);
+   FrameSpec=max(FrameSpec-alpha*NoiseSpec,beta*FrameSpec);
       
   
    

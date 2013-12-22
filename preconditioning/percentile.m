@@ -1,9 +1,14 @@
 function output = percentile(input,percentile_params)
 
-%% Percentile noise substraction- ENPROCESO
+%% Percentile noise substraction
 
-    % assure input vectors to be columns
-    input = input(:);
+% Original Source from Thierry Dutoit, Ferran Marquès, 
+%   "Applied Signal Processing-A MATLAB-Based Proof of Concept"
+%   Springer:New-York, 2009
+
+
+% assure input vectors to be columns
+input = input(:);
     
 global Fs;
 percentil = percentile_params.percentil;
@@ -73,42 +78,5 @@ F=length(FrameFFT);
   % Notice the frames are 50% overlapped
   end
   output=ProcessedSignal;
-  %%
   
-  %%PERCENTILE CURVE
-
-%L=floor(length(T)/2);
- %for j=1:100
-  %      resultado(j)=prctile(S(L,:),j);
-% end
- %resultado=abs(resultado);
-    %PLOT ALL
-%figure()
-%plot(resultado);
-%ylabel('Spectrogrmvalue');
-%xlabel('percentil');
-  
-  %% BASURA QUE PUEDE SER UTIL EN EL FUTURO
-  %
-  %for k=1:Window_length
-    
- %  index1=(k-1)*(Window_overlap)+1;
-  % index2=(k-1)*(Window_overlap)+Window_length;
-   %Frame=input(index1:index2);
-   %WindowedFrame=Frame.*Window;
-   %FrameFFT=fft(WindowedFrame);
-   %FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length);
-   %N(k)=prctile(FrameSpec(k),percentil); % Averaging
-%end
-
-
- %Frame=Signalcortada(index1:index2);
-   %WindowedFrame=Frame.*Window;
-   %FrameFFT=fft(WindowedFrame,NFFT);
-   %FrameSpec=((abs(FrameFFT)).^gamma)*(1/Window_length); % Frame periodogram
-   %FramePhase=angle(FrameFFT); % Save the phase function
-  % FrameSpec=((abs(S(:,i))))*(1/Window_length); % Frame periodogram
-   %FramePhase(i)=angle(S(:,i)); % Save the phase function
-      %  FrameSpec=max(FrameSpec-N,0);
-    
 end
