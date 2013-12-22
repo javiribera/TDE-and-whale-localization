@@ -64,6 +64,21 @@ end
     T1.event(1).delay(7,5).seconds=-4.0125;
     T1.event(1).delay(7,6).seconds=-1.3125;
 
+% event 2 (from 8:40 to 9:00)
+    T1.event(2).delay(1,2).seconds=3.9;
+    T1.event(2).delay(1,3).seconds=5.775;
+    T1.event(2).delay(1,4).seconds=4.2375;
+    T1.event(2).delay(1,5).seconds=-6.5625;
+    T1.event(2).delay(1,6).seconds=-3.7875;
+    T1.event(2).delay(1,7).seconds=-2.3625;
+
+    T1.event(2).delay(2,1).seconds=-3.9;
+    T1.event(2).delay(2,3).seconds=1.875;
+    T1.event(2).delay(2,4).seconds=0.3;
+    T1.event(2).delay(2,5).seconds=-10.5;
+    T1.event(2).delay(2,6).seconds=-7.725;
+    T1.event(2).delay(2,7).seconds=-6.3;
+
 for e=1:length(T1.event)
     for i=1:length(T1.event(e).delay(:,1))
         for j=1:length(T1.event(e).delay(1,:))

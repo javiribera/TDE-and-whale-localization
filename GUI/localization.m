@@ -242,6 +242,7 @@ function event_set_menu_Callback(hObject, ~, handles)
     elseif isempty(T1)
         msgbox('Import a file with  precomputed TDEs before selecting an event',...
             'Import a file first','warn')
+        set(hObject,'Value',1)
     else % place delay in GUI's textfields
         delay_textfields_upload(T1.event(event).delay, reference, handles)
     end
