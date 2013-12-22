@@ -18,10 +18,4 @@ function filter = build_filter()
     % Construct an FDESIGN object and call its CHEBY1 method.
     h  = fdesign.bandpass('N,Fp1,Fp2,Ap', N, Fpass1, Fpass2, Apass, Fs);
     filter = design(h, 'cheby1');
-    
-    % DEBUG: visualize the frequency response of the filter
-    global DEBUG
-    if ~isempty(DEBUG) && DEBUG
-        fvtool(filter);
-    end
 end

@@ -276,6 +276,8 @@ function tdoa(handles,where)
             plot(handles.axes_tdoa,0)
             [delay_samples,h,e] = delay_lms(preprocessed_signal1, preprocessed_signal2, max_delay, length_signal, beta, handles);
             plot(handles.axes_tdoa, h)
+        %case 'AED (Adaptive Eigenvalue Decomposition)'
+            
     end
     delay_seconds = delay_samples / Fs;
     set(handles.estimation_samples, 'String', [num2str(delay_samples), ' samples']);
@@ -430,3 +432,6 @@ function plot_options_Callback(hObject, eventdata, handles)
 function go_to_main_menu_Callback(~, ~, ~) 
     close
     main
+    
+function show_filter_response_Callback(~, ~, ~)
+    fvtool(build_filter());
