@@ -3,6 +3,7 @@ function sensors = sensors_position()
 % sensors = [X_1 Y_1 Y_1;
 %            X_2 Y_2 Y_2;
 %            ...]
+% This returns hardcoded location of our sensors from US navy's PMRF
 
     sensor1 = [6566 -9617 -4500];
     sensor2 = [6635 -2132 -4500];
@@ -22,4 +23,3 @@ function sensors = sensors_position()
               ];
 
 end
-

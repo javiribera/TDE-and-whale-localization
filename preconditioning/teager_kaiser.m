@@ -14,3 +14,6 @@ L = length(x);
 y = x(2:L-1).^2-x(1:L-2).*x(3:L);
 y = [y(1); y; y(L-2)]; % so that lenght(y)=length(x)
 
+
+% TK should'nt be applied as it is only convenient for impulsive signals, and
+% minke whales are not, so TK removes them. Not useful in our case.
